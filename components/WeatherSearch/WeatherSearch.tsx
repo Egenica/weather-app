@@ -11,6 +11,8 @@ export default function WeatherSearch() {
   const [search, setSearch] = useState('');
   const [locations, setLocations] = useState<WeatherLocation[] | null>(null);
   const [filteredLocations, setFilteredLocations] = useState<WeatherLocation[] | null>(null);
+  const [placeholder, setPlaceholder] = useState('Search locations...');
+  const [showScroll, setShowScroll] = useState(false);
 
   useEffect(() => {
     getWeatherLocations().then((data) => setLocations(data));
@@ -34,7 +36,15 @@ export default function WeatherSearch() {
           value={search}
           className="ring-offset-background:none rounded-3xl p-8 text-center text-xl font-light placeholder:text-slate-400"
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search locations..."
+          placeholder={placeholder}
+          onFocus={() => {
+            setPlaceholder('');
+            setShowScroll(true);
+          }}
+          onBlur={() => {
+            setPlaceholder('Search locations...');
+            setShowScroll(false);
+          }}
         />
         <Button
           type="submit"
@@ -47,22 +57,25 @@ export default function WeatherSearch() {
           X
         </Button>
       </div>
-      {filteredLocations && (
+      {filteredLocations && showScroll && (
         <ScrollArea
           className={
             filteredLocations.length >= 6
-              ? 'mt-2 h-96 w-auto rounded-md border'
-              : 'mt-2 h-auto w-auto rounded-md border'
+              ? 'mx-80 mt-2 h-96 w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur'
+              : 'mx-80 mt-2 h-auto w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur'
           }
         >
           <div className="p-4">
             <ul className="m-0">
               {filteredLocations.map((location, i) => (
                 <li key={location.id}>
-                  <Button variant={'link'} className="block w-full hover:bg-slate-100">
+                  <Button
+                    variant={'link'}
+                    className="block h-auto w-full text-xl font-light text-white hover:bg-slate-100 hover:text-black"
+                  >
                     {location.name}
                   </Button>
-                  {i !== filteredLocations.length - 1 && <Separator className="my-3" />}
+                  {i !== filteredLocations.length - 1 && <Separator className="my-3 opacity-20" />}
                 </li>
               ))}
             </ul>
