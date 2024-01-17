@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <>
       <div className="container">
-        <h1 className="mt-10 text-center text-4xl font-thin text-slate-500">Find your Weather location</h1>
+        <h1 className="mb-6 mt-10 text-center text-4xl font-thin text-teal-600">Find your Weather location</h1>
 
         {/* <WeatherLocations /> */}
         <WeatherSearch />
