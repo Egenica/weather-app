@@ -7,5 +7,8 @@
     "plugin:typescript-sort-keys/recommended"
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "typescript-sort-keys"]
+  "plugins": ["@typescript-eslint", "typescript-sort-keys"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["warn", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }]
+  }
 }
