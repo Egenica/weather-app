@@ -6,6 +6,7 @@ export const ButtonClient = () => {
   return (
     <>
       <Button
+        variant={'outline'}
         onClick={() => {
           console.log('clicked');
         }}

@@ -7,10 +7,11 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <h1>Weather App </h1>
-      <div className="bg-blue-500 text-white p-4">This is a box</div>
-      <ButtonClient />
-      <h1>blah bl</h1>
+      <div className="container">
+        <h1 className="text-center">Weather App </h1>
+        <div className="bg-blue-950 p-4 text-center text-white">This is a box</div>
+        <ButtonClient />
+      </div>
     </>
   );
 }
