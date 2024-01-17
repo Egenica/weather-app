@@ -1,7 +1,11 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 
 import { MiniNav } from './MiniNav';
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('MiniNav', () => {
   it('renders the Change Location button', () => {

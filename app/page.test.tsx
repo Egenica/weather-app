@@ -1,14 +1,15 @@
-// FILEPATH: /Users/jkl/Documents/GitHub/weather-app/app/page.test.tsx
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
 
 import Page from './page';
 
-//fetchMock.enableMocks();
-
 beforeEach(() => {
   fetchMock.resetMocks();
+});
+
+afterEach(() => {
+  cleanup();
 });
 
 describe('Page', () => {
