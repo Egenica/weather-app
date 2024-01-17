@@ -1,14 +1,13 @@
-export const metadata = {
-  title: 'App Router',
-};
-
 import Counter from './counter';
+
+export const metadata = {
+  title: 'Weather App',
+};
 
 export default function Page() {
   return (
     <>
-      <h1>App Router wd</h1>
-      <Counter />
+      <h1>Weather App </h1>
     </>
   );
 }
