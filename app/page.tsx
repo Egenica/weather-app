@@ -1,5 +1,3 @@
-import Counter from './counter';
-
 export const metadata = {
   title: 'Weather App',
 };
