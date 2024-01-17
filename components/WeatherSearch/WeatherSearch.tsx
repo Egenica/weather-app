@@ -1,5 +1,9 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { WeatherLocation, getWeatherLocations } from '@/components/weather.server';
 import { useEffect, useState } from 'react';
 
@@ -23,14 +27,23 @@ export default function WeatherSearch() {
   }, [search, locations]);
 
   return (
-    <div>
-      <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search locations..." />
+    <div className="mt-4">
+      <Input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search locations..." />
       {filteredLocations && (
-        <ul>
-          {filteredLocations.map((location) => (
-            <li key={location.id}>{location.name}</li>
-          ))}
-        </ul>
+        <ScrollArea className="mt-2 h-72 w-auto rounded-md border">
+          <div className="p-4">
+            <ul className="m-0">
+              {filteredLocations.map((location) => (
+                <li key={location.id}>
+                  <Button variant={'link'} className="block w-full">
+                    {location.name}
+                  </Button>
+                  <Separator className="my-2" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </ScrollArea>
       )}
     </div>
   );

@@ -12,11 +12,11 @@ export default function Page() {
   return (
     <>
       <div className="container">
-        <h1 className="text-center">Weather App </h1>
-        <div className="rounded bg-blue-950 p-4 text-center text-white">This is a box</div>
+        <h1 className="mt-10 text-center text-4xl font-thin text-slate-500">Find your Weather location</h1>
+
         {/* <WeatherLocations /> */}
         <WeatherSearch />
-        <ButtonClient />
+        {/* <ButtonClient /> */}
       </div>
     </>
   );
