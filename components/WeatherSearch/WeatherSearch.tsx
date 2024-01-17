@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { WeatherLocation, getWeatherLocations } from '@/components/weather.server';
 import { useEffect, useState } from 'react';
 
-export default function WeatherSearch() {
+export default function WeatherSearch({ ...props }) {
   const [search, setSearch] = useState('');
   const [locations, setLocations] = useState<WeatherLocation[] | null>(null);
   const [filteredLocations, setFilteredLocations] = useState<WeatherLocation[] | null>(null);
@@ -19,17 +19,26 @@ export default function WeatherSearch() {
   }, []);
 
   useEffect(() => {
+    // if (search.length >= 3) {
+    //   setFilteredLocations(
+    //     locations ? locations.filter((location) => location.name.toLowerCase().includes(search.toLowerCase())) : null,
+    //   );
+    // } else {
+    //   setFilteredLocations(null);
+    // }
     if (search.length >= 3) {
-      setFilteredLocations(
-        locations ? locations.filter((location) => location.name.toLowerCase().includes(search.toLowerCase())) : null,
-      );
+      if (locations) {
+        setFilteredLocations(
+          locations.filter((location) => location.name.toLowerCase().includes(search.toLowerCase())),
+        );
+      }
     } else {
       setFilteredLocations(null);
     }
   }, [search, locations]);
 
   return (
-    <div className="mt-4 text-center">
+    <div {...props} className="mt-4 text-center">
       <div className="relative">
         <Input
           type="text"
@@ -47,7 +56,7 @@ export default function WeatherSearch() {
           }}
         />
         <Button
-          type="submit"
+          type="button"
           className="absolute right-4 top-1/2 -translate-y-1/2 transform rounded-full bg-slate-400"
           onClick={() => {
             setFilteredLocations(null);
