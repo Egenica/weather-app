@@ -6,18 +6,19 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 
 type WeatherSearchProps = {
   setLocation: (location: WeatherLocation) => void;
 };
 
 export default function WeatherSearch({ setLocation, ...props }: WeatherSearchProps) {
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1224 });
   const [search, setSearch] = useState('');
   const [locations, setLocations] = useState<WeatherLocation[] | null>(null);
   const [filteredLocations, setFilteredLocations] = useState<WeatherLocation[] | null>(null);
   const [placeholder, setPlaceholder] = useState('Search locations...');
   const [showScroll, setShowScroll] = useState(false);
-  // const [location, setLocation] = useState<WeatherLocation | null>(null);
 
   useEffect(() => {
     getWeatherLocations().then((data) => setLocations(data));
@@ -34,10 +35,6 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
       setFilteredLocations(null);
     }
   }, [search, locations]);
-
-  //console.log(JSON.stringify(filteredLocations));
-
-  // console.log('location', location);
 
   return (
     <div {...props} className="mt-4 text-center">
@@ -86,8 +83,11 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
                     variant={'link'}
                     className="block h-auto w-full text-xl font-light text-white hover:bg-slate-100 hover:text-black"
                     onClick={() => setLocation(location)}
+                    title={location?.name}
                   >
-                    {location?.name.length > 20 ? location?.name.slice(0, 20) + '...' : location?.name}
+                    {isTabletOrMobile && location?.name.length > 20
+                      ? location?.name.slice(0, 20) + '...'
+                      : location?.name}
                   </Button>
                   {i !== filteredLocations.length - 1 && <Separator className="my-3 opacity-20" />}
                 </li>
