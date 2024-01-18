@@ -62,12 +62,12 @@ export default function WeatherSearch({ ...props }) {
           X
         </Button>
       </div>
-      {filteredLocations && showScroll && (
+      {filteredLocations && (
         <ScrollArea
           className={
             filteredLocations.length >= 6
-              ? 'mx-80 mt-2 h-96 w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur'
-              : 'mx-80 mt-2 h-auto w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur'
+              ? 'mx-auto mt-2 h-96 w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur md:w-2/4'
+              : 'mx-auto mt-2 h-auto w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur md:w-2/4'
           }
           data-testid="scroll-area"
         >
