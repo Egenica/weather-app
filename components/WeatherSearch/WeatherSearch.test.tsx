@@ -2,8 +2,8 @@ import { WeatherLocation } from '@/components/server/weather.server';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
 
+import { mockSearchData } from '../../mocks/mockSearchData';
 import WeatherSearch from './WeatherSearch';
-import { mockSearchData } from './mockData';
 
 beforeEach(() => {
   fetchMock.mockResponseOnce(JSON.stringify(mockSearchData as WeatherLocation[]));
@@ -16,13 +16,13 @@ afterEach(() => {
 
 describe('WeatherSearch', () => {
   it('renders without crashing', () => {
-    render(<WeatherSearch />);
+    render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByPlaceholderText('Search locations...');
     expect(inputElement).toBeInTheDocument();
   });
 
   it('filters locations based on search input', async () => {
-    render(<WeatherSearch />);
+    render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByTestId('search-input');
 
     // Simulate user typing 'Location 1' into the search input
@@ -47,7 +47,7 @@ describe('WeatherSearch', () => {
   });
 
   it('counts the number of items returned', async () => {
-    render(<WeatherSearch />);
+    render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByTestId('search-input');
 
     // Simulate user typing 'Location 1' into the search input
@@ -74,7 +74,7 @@ describe('WeatherSearch', () => {
   });
 
   it('does not display locations when search input is less than 3 characters', async () => {
-    render(<WeatherSearch />);
+    render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByPlaceholderText('Search locations...');
 
     // Simulate user typing 'Sc' into the search input
