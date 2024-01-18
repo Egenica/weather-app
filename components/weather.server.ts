@@ -22,6 +22,7 @@ export async function getWeatherLocations() {
 
   if (storedData) {
     // If the data is in session storage, parse it and return it
+    // console.log(JSON.stringify(JSON.parse(storedData).splice(0, 10)));
     return JSON.parse(storedData) as WeatherLocation[];
   } else {
     // If the data is not in session storage, fetch it
@@ -33,6 +34,8 @@ export async function getWeatherLocations() {
 
     // Store the fetched data in session storage
     sessionStorage.setItem('weatherLocations', JSON.stringify(data.Locations.Location));
+
+    // console.log(data.Locations.Location);
 
     return data.Locations.Location;
   }

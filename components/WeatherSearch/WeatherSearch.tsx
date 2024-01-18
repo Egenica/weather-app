@@ -19,13 +19,6 @@ export default function WeatherSearch({ ...props }) {
   }, []);
 
   useEffect(() => {
-    // if (search.length >= 3) {
-    //   setFilteredLocations(
-    //     locations ? locations.filter((location) => location.name.toLowerCase().includes(search.toLowerCase())) : null,
-    //   );
-    // } else {
-    //   setFilteredLocations(null);
-    // }
     if (search.length >= 3) {
       if (locations) {
         setFilteredLocations(
@@ -36,6 +29,8 @@ export default function WeatherSearch({ ...props }) {
       setFilteredLocations(null);
     }
   }, [search, locations]);
+
+  //console.log(JSON.stringify(filteredLocations));
 
   return (
     <div {...props} className="mt-4 text-center">
@@ -54,6 +49,7 @@ export default function WeatherSearch({ ...props }) {
             setPlaceholder('Search locations...');
             setShowScroll(false);
           }}
+          data-testid="search-input"
         />
         <Button
           type="button"
@@ -73,6 +69,7 @@ export default function WeatherSearch({ ...props }) {
               ? 'mx-80 mt-2 h-96 w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur'
               : 'mx-80 mt-2 h-auto w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur'
           }
+          data-testid="scroll-area"
         >
           <div className="p-4">
             <ul className="m-0">
