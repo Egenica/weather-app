@@ -1,4 +1,4 @@
-export interface WeatherLocation {
+export type WeatherLocation = {
   elevation: string;
   id: string;
   latitude: string;
@@ -8,13 +8,13 @@ export interface WeatherLocation {
   obsSource?: string;
   region?: string;
   unitaryAuthArea?: string;
-}
+};
 
-interface WeatherLocationsResponse {
+type WeatherLocationsResponse = {
   Locations: {
     Location: WeatherLocation[];
   };
-}
+};
 
 export async function getWeatherLocations() {
   // Try to get the data from session storage

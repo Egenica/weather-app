@@ -1,4 +1,4 @@
-import { WeatherLocation } from '@/components/weather.server';
+import { WeatherLocation } from '@/components/server/weather.server';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
 

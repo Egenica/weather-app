@@ -1,7 +1,7 @@
 'use client';
 
 // Import necessary hooks and components from React and Next.js
-import { WeatherLocation, getWeatherLocations } from '@/components/weather.server';
+import { WeatherLocation, getWeatherLocations } from '@/components/server/weather.server';
 import { useEffect, useState } from 'react';
 
 export default function WeatherLocations() {

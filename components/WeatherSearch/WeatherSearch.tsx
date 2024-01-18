@@ -1,10 +1,10 @@
 'use client';
 
+import { WeatherLocation, getWeatherLocations } from '@/components/server/weather.server';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { WeatherLocation, getWeatherLocations } from '@/components/weather.server';
 import { useEffect, useState } from 'react';
 
 export default function WeatherSearch({ ...props }) {
