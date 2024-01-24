@@ -1,4 +1,4 @@
-export type WeatherLocation = {
+export type WeatherLocationT = {
   elevation: string;
   id: string;
   latitude: string;
@@ -12,7 +12,7 @@ export type WeatherLocation = {
 
 type WeatherLocationsResponse = {
   Locations: {
-    Location: WeatherLocation[];
+    Location: WeatherLocationT[];
   };
 };
 
@@ -23,7 +23,7 @@ export async function getWeatherLocations() {
   if (storedData) {
     // If the data is in session storage, parse it and return it
     // console.log(JSON.stringify(JSON.parse(storedData).splice(0, 10)));
-    return JSON.parse(storedData) as WeatherLocation[];
+    return JSON.parse(storedData) as WeatherLocationT[];
   } else {
     // If the data is not in session storage, fetch it
     const res = await fetch(

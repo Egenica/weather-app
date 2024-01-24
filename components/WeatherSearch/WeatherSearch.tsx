@@ -1,6 +1,6 @@
 'use client';
 
-import { WeatherLocation, getWeatherLocations } from '@/components/server/weather.server';
+import { WeatherLocationT, getWeatherLocations } from '@/components/server/weather.server';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -9,14 +9,14 @@ import { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
 type WeatherSearchProps = {
-  setLocation: (location: WeatherLocation) => void;
+  setLocation: (location: WeatherLocationT) => void;
 };
 
 export default function WeatherSearch({ setLocation, ...props }: WeatherSearchProps) {
   const isTabletOrMobile = useMediaQuery({ maxWidth: 1224 });
   const [search, setSearch] = useState('');
-  const [locations, setLocations] = useState<WeatherLocation[] | null>(null);
-  const [filteredLocations, setFilteredLocations] = useState<WeatherLocation[] | null>(null);
+  const [locations, setLocations] = useState<WeatherLocationT[] | null>(null);
+  const [filteredLocations, setFilteredLocations] = useState<WeatherLocationT[] | null>(null);
   const [placeholder, setPlaceholder] = useState('Search locations...');
   const [showScroll, setShowScroll] = useState(false);
 

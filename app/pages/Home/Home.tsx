@@ -1,12 +1,13 @@
 'use client';
 
 import { MiniNav } from '@/components/MiniNav/MiniNav';
+import { WeatherLocation } from '@/components/WeatherLocation/WeatherLocation';
 import WeatherSearch from '@/components/WeatherSearch/WeatherSearch';
-import { WeatherLocation } from '@/components/server/weather.server';
+import { WeatherLocationT } from '@/components/server/weather.server';
 import { useState } from 'react';
 
 export default function Home({ ...props }) {
-  const [location, setLocation] = useState<WeatherLocation | null>(null);
+  const [location, setLocation] = useState<WeatherLocationT | null>(null);
 
   console.log('location', location);
 
@@ -22,6 +23,7 @@ export default function Home({ ...props }) {
         ) : (
           <>
             <h1 className="mb-10 mt-10 text-center text-4xl font-thin text-teal-600">{location.name}</h1>
+            <WeatherLocation id={location.id} />
           </>
         )}
       </div>
