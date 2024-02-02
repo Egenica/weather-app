@@ -22,7 +22,9 @@ export default function Home({ ...props }) {
           </>
         ) : (
           <>
-            <h1 className="mb-10 mt-10 text-center text-4xl font-thin text-teal-600">{location.name}</h1>
+            <h1 className="mb-10 mt-10 text-center text-4xl font-thin text-teal-600">
+              {location.name} - 5 Day Forcast
+            </h1>
             <WeatherLocation id={location.id} />
           </>
         )}
