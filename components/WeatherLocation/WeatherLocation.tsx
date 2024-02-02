@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/carousel';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import React, { Fragment, useEffect, useState } from 'react';
-// @ts-expect-error - Fixes the icons any error
 import {
   WiDirectionDown,
   WiDirectionDownLeft,
