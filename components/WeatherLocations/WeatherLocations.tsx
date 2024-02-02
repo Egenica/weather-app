@@ -1,12 +1,12 @@
 'use client';
 
 // Import necessary hooks and components from React and Next.js
-import { WeatherLocation, getWeatherLocations } from '@/components/server/weather.server';
+import { WeatherLocationT, getWeatherLocations } from '@/components/server/weather.server';
 import { useEffect, useState } from 'react';
 
 export default function WeatherLocations() {
   // Create a state variable to hold the fetched data
-  const [locations, setLocations] = useState<WeatherLocation[] | null>(null);
+  const [locations, setLocations] = useState<WeatherLocationT[] | null>(null);
 
   // Use the useEffect hook to fetch the data when the component mounts
   useEffect(() => {

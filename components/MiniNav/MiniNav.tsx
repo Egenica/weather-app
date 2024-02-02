@@ -1,11 +1,11 @@
 import { useMediaQuery } from 'react-responsive';
 
-import { WeatherLocation } from '../server/weather.server';
+import { WeatherLocationT } from '../server/weather.server';
 import { Button } from '../ui/button';
 
 type MiniNavProps = {
-  location: WeatherLocation | null;
-  setLocation: (location: WeatherLocation | null) => void;
+  location: WeatherLocationT | null;
+  setLocation: (location: WeatherLocationT | null) => void;
 };
 
 export const MiniNav = ({ location, setLocation, ...props }: MiniNavProps) => {
