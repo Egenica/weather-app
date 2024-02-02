@@ -81,7 +81,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
   console.log('locationData', locationData);
 
   const displayDate = (period: string) => {
-    const periodDate = new Date(period);
+    const dateFix = period.replace(/Z/g, '');
+    const periodDate = new Date(dateFix);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -102,7 +103,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
   return (
     <>
       {locationData && (
-        <div className="mx-10">
+        <div className="mx-0 md:mx-10">
           <div className="flex flex-col items-center justify-center ">
             <span className="rounded-t bg-white px-2 text-xs font-light text-black">Now at a glance</span>
             <div className="flex items-center justify-center rounded border border-solid border-white  bg-white bg-opacity-10 backdrop-blur-xl">
@@ -139,8 +140,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                 return (
                   <Fragment key={periodIndex}>
                     <CarouselItem>
-                      <h3 className="mb-5 inline-block rounded bg-white p-3 py-2 text-xl font-light">
-                        {displayDate(period.value)}
+                      <h3 className="mb-5 mt-5 rounded bg-white p-3 py-2 text-center text-xl font-light md:inline-block md:text-left">
+                        {displayDate(period.value)} - Day {current} of {count}
                       </h3>
                       <Table className="bg-blur mb-5 rounded bg-white bg-opacity-10 backdrop-blur-xl">
                         <TableHeader className=" bg-white bg-opacity-10 ">
@@ -169,12 +170,14 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                 );
               })}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            <div className="hidden md:block">
+              <CarouselPrevious />
+              <CarouselNext />
+            </div>
           </Carousel>
-          <h5 className="mb-5 inline-block rounded bg-white p-3 py-2 text-center text-xl font-light">
+          {/* <h5 className="mb-5 inline-block rounded bg-white p-3 py-2 text-center text-xl font-light">
             Day {current} of {count}
-          </h5>
+          </h5> */}
         </div>
       )}
     </>
