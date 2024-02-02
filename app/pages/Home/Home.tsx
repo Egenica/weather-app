@@ -9,7 +9,7 @@ import { useState } from 'react';
 export default function Home({ ...props }) {
   const [location, setLocation] = useState<WeatherLocationT | null>(null);
 
-  console.log('location', location);
+  if (location) console.log('location', location);
 
   return (
     <div {...props}>

@@ -19,10 +19,12 @@ type WeatherLocationsResponse = {
 export async function getWeatherLocations() {
   // Try to get the data from session storage
   const storedData = sessionStorage.getItem('weatherLocations');
+  // const storedData = null;
 
   if (storedData) {
     // If the data is in session storage, parse it and return it
     // console.log(JSON.stringify(JSON.parse(storedData).splice(0, 10)));
+    console.log('Data from session storage');
     return JSON.parse(storedData) as WeatherLocationT[];
   } else {
     // If the data is not in session storage, fetch it

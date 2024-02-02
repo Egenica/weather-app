@@ -46,7 +46,8 @@ type WeatherLocationDataProps = {
 
 export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
   // Try to get the data from session storage
-  const storedData = sessionStorage.getItem('location');
+  // const storedData = sessionStorage.getItem('location');
+  const storedData = null;
 
   if (storedData) {
     // If the data is in session storage, parse it and return it

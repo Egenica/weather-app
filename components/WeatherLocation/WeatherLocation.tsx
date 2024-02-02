@@ -8,6 +8,23 @@ import {
 } from '@/components/ui/carousel';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import React, { Fragment, useEffect, useState } from 'react';
+// @ts-expect-error - Fixes the icons any error
+import {
+  WiDirectionDown,
+  WiDirectionDownLeft,
+  WiDirectionDownRight,
+  WiDirectionLeft,
+  WiDirectionRight,
+  WiDirectionUp,
+  WiDirectionUpLeft,
+  WiDirectionUpRight,
+  WiNightAltRainMix,
+  WiNightAltRainWind,
+  WiRain,
+  WiRainMix,
+  WiStrongWind,
+  WiWindy,
+} from 'weather-icons-react';
 
 import { Location, getWeatherLocationData } from './../server/weather.location.server';
 
@@ -15,8 +32,23 @@ type WeatherLocationProps = {
   id: string | null;
 };
 
+type WeatherReportNow = {
+  $: string;
+  D: string;
+  F: string;
+  G: string;
+  H: string;
+  Pp: string;
+  S: string;
+  T: string;
+  U: string;
+  V: string;
+  W: string;
+};
+
 export const WeatherLocation = ({ id }: WeatherLocationProps) => {
   const [locationData, setLocationData] = useState<Location | null>(null);
+  const [weatherNow, setWeatherNow] = useState<WeatherReportNow | null>(null);
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -28,6 +60,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
           console.error('Expected Location object but received array');
         } else {
           setLocationData(data);
+          setWeatherNow(data.SiteRep.DV.Location.Period[0].Rep[0]);
         }
       });
     }
@@ -46,6 +79,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     });
   }, [api]);
 
+  console.log('locationData', locationData);
+
   const displayDate = (period: string) => {
     const periodDate = new Date(period);
     const today = new Date();
@@ -63,12 +98,36 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     return <div>Loading...</div>;
   }
 
-  console.log('locationData', locationData);
+  // console.log('locationData', locationData);
 
   return (
     <>
       {locationData && (
         <div className="mx-10">
+          <div className="flex flex-col items-center justify-center ">
+            <span className="rounded-t bg-white px-2 text-xs font-light text-black">Now at a glance</span>
+            <div className="flex items-center justify-center rounded border border-solid border-white  bg-white bg-opacity-10 backdrop-blur-xl">
+              <span className="p-4 pl-10 text-4xl font-light text-white">
+                {weatherNow?.F}
+                <span>°</span>
+              </span>
+              {Number(weatherNow?.Pp) >= 20 && Number(weatherNow?.Pp) < 50 && <WiRainMix size={100} color="#fff" />}
+              {Number(weatherNow?.Pp) >= 50 && Number(weatherNow?.Pp) < 100 && <WiRain size={100} color="#fff" />}
+              {Number(weatherNow?.G) >= 20 && Number(weatherNow?.G) < 50 && <WiWindy size={100} color="#fff" />}
+              {Number(weatherNow?.G) >= 50 && Number(weatherNow?.G) < 100 && <WiStrongWind size={100} color="#fff" />}
+              {weatherNow?.D === 'N' && <WiDirectionUp size={100} color="#fff" />}
+              {weatherNow?.D === 'NE' && <WiDirectionUpRight size={100} color="#fff" />}
+              {weatherNow?.D === 'NW' && <WiDirectionUpLeft size={100} color="#fff" />}
+              {weatherNow?.D === 'W' && <WiDirectionLeft size={100} color="#fff" />}
+              {weatherNow?.D === 'WSW' && <WiDirectionDownLeft size={100} color="#fff" />}
+              {weatherNow?.D === 'S' && <WiDirectionDown size={100} color="#fff" />}
+              {weatherNow?.D === 'SE' && <WiDirectionDownRight size={100} color="#fff" />}
+              {weatherNow?.D === 'E' && <WiDirectionRight size={100} color="#fff" />}
+              {Number(weatherNow?.Pp) >= 51 && Number(weatherNow?.Pp) < 100 && (
+                <WiNightAltRainWind size={100} color="#fff" />
+              )}
+            </div>
+          </div>
           <Carousel
             opts={{
               align: 'start',
