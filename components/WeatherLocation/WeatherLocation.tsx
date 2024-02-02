@@ -123,9 +123,9 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
               {weatherNow?.D === 'S' && <WiDirectionDown size={100} color="#fff" />}
               {weatherNow?.D === 'SE' && <WiDirectionDownRight size={100} color="#fff" />}
               {weatherNow?.D === 'E' && <WiDirectionRight size={100} color="#fff" />}
-              {Number(weatherNow?.Pp) >= 51 && Number(weatherNow?.Pp) < 100 && (
+              {/* {Number(weatherNow?.Pp) >= 51 && Number(weatherNow?.Pp) < 100 && (
                 <WiNightAltRainWind size={100} color="#fff" />
-              )}
+              )} */}
             </div>
           </div>
           <Carousel
