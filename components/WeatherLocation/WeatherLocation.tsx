@@ -84,6 +84,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
             opts={{
               align: 'start',
               loop: true,
+              watchDrag: false,
             }}
             setApi={setApi}
           >
