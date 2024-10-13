@@ -8,8 +8,8 @@ export const TodaysWeather = ({ weatherNow }: { weatherNow: WeatherReportNow | n
   return (
     <div className="flex flex-col items-center justify-center ">
       <span className="rounded-t bg-white px-2 text-xs font-light text-black">Now at a glance</span>
-      <div className="flex items-center justify-center rounded border border-solid border-white bg-white bg-opacity-10 align-top backdrop-blur-xl">
-        <div className="relative top-[-0.5rem] flex">
+      <div className="flex w-full items-center overflow-x-scroll rounded border border-solid border-white bg-white bg-opacity-10 align-top backdrop-blur-xl md:w-auto md:justify-center">
+        <div className="relative top-[-0.8rem] flex">
           <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
             {weatherType(weatherNow?.W as string)[1]({ size: 60, color: '#fff' })}
             <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
