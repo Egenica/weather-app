@@ -93,7 +93,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                 return (
                   <Fragment key={periodIndex}>
                     <CarouselItem>
-                      <h3 className="mb-5 mt-5 flex flex-row items-center justify-center rounded bg-white p-3 py-2 text-center text-lg font-light md:inline-block md:text-left md:text-xl ">
+                      <h3 className="mb-5 mt-5 flex flex-row items-center justify-center rounded bg-white p-3 py-2 text-center text-base font-light md:inline-block md:text-left md:text-xl ">
                         <CarouselPrevious className="relative mr-auto" />
                         <span className="mx-3 inline-block">
                           {displayDate(period.value)} - Day {current} of {count}
