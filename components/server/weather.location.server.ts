@@ -83,5 +83,7 @@ export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
 
   const data: Location = await res.json();
 
+  //console.log(data);
+
   return data;
 }

@@ -6,13 +6,13 @@ import WeatherSearch from '@/components/WeatherSearch/WeatherSearch';
 import { WeatherLocationT } from '@/components/server/weather.server';
 import { useState } from 'react';
 
-export default function Home({ ...props }) {
+export default function Home() {
   const [location, setLocation] = useState<WeatherLocationT | null>(null);
 
   if (location) console.log('location', location);
 
   return (
-    <div {...props}>
+    <div>
       <MiniNav data-testid="mini-nav" location={location} setLocation={setLocation} />
       <div className="container">
         {!location ? (

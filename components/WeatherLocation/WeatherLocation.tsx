@@ -7,42 +7,16 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { WeatherReportNow } from 'app/types/types';
 import React, { Fragment, useEffect, useState } from 'react';
-import {
-  WiDirectionDown,
-  WiDirectionDownLeft,
-  WiDirectionDownRight,
-  WiDirectionLeft,
-  WiDirectionRight,
-  WiDirectionUp,
-  WiDirectionUpLeft,
-  WiDirectionUpRight,
-  WiNightAltRainMix,
-  WiNightAltRainWind,
-  WiRain,
-  WiRainMix,
-  WiStrongWind,
-  WiWindy,
-} from 'weather-icons-react';
 
+import { TodaysWeather } from '../TodaysWeather/TodaysWeather';
+import { weatherType } from '../TodaysWeather/weatherType';
+import { WindDirection } from '../WeatherDirection/WeatherDirection';
 import { Location, getWeatherLocationData } from './../server/weather.location.server';
 
 type WeatherLocationProps = {
   id: string | null;
-};
-
-type WeatherReportNow = {
-  $: string;
-  D: string;
-  F: string;
-  G: string;
-  H: string;
-  Pp: string;
-  S: string;
-  T: string;
-  U: string;
-  V: string;
-  W: string;
 };
 
 export const WeatherLocation = ({ id }: WeatherLocationProps) => {
@@ -60,6 +34,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         } else {
           setLocationData(data);
           setWeatherNow(data.SiteRep.DV.Location.Period[0].Rep[0]);
+          console.log('data', data);
         }
       });
     }
@@ -98,36 +73,13 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     return <div>Loading...</div>;
   }
 
-  // console.log('locationData', locationData);
+  console.log('locationData', locationData);
 
   return (
     <>
       {locationData && (
         <div className="mx-0 md:mx-10">
-          <div className="flex flex-col items-center justify-center ">
-            <span className="rounded-t bg-white px-2 text-xs font-light text-black">Now at a glance</span>
-            <div className="flex items-center justify-center rounded border border-solid border-white  bg-white bg-opacity-10 backdrop-blur-xl">
-              <span className="p-4 pl-10 text-4xl font-light text-white">
-                {weatherNow?.F}
-                <span>°</span>
-              </span>
-              {Number(weatherNow?.Pp) >= 20 && Number(weatherNow?.Pp) < 50 && <WiRainMix size={100} color="#fff" />}
-              {Number(weatherNow?.Pp) >= 50 && Number(weatherNow?.Pp) < 100 && <WiRain size={100} color="#fff" />}
-              {Number(weatherNow?.G) >= 20 && Number(weatherNow?.G) < 50 && <WiWindy size={100} color="#fff" />}
-              {Number(weatherNow?.G) >= 50 && Number(weatherNow?.G) < 100 && <WiStrongWind size={100} color="#fff" />}
-              {weatherNow?.D === 'N' && <WiDirectionUp size={100} color="#fff" />}
-              {weatherNow?.D === 'NE' && <WiDirectionUpRight size={100} color="#fff" />}
-              {weatherNow?.D === 'NW' && <WiDirectionUpLeft size={100} color="#fff" />}
-              {weatherNow?.D === 'W' && <WiDirectionLeft size={100} color="#fff" />}
-              {weatherNow?.D === 'WSW' && <WiDirectionDownLeft size={100} color="#fff" />}
-              {weatherNow?.D === 'S' && <WiDirectionDown size={100} color="#fff" />}
-              {weatherNow?.D === 'SE' && <WiDirectionDownRight size={100} color="#fff" />}
-              {weatherNow?.D === 'E' && <WiDirectionRight size={100} color="#fff" />}
-              {/* {Number(weatherNow?.Pp) >= 51 && Number(weatherNow?.Pp) < 100 && (
-                <WiNightAltRainWind size={100} color="#fff" />
-              )} */}
-            </div>
-          </div>
+          <TodaysWeather weatherNow={weatherNow} />
           <Carousel
             opts={{
               align: 'start',
@@ -145,20 +97,35 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                       </h3>
                       <Table className="bg-blur mb-5 rounded bg-white bg-opacity-10 backdrop-blur-xl">
                         <TableHeader className=" bg-white bg-opacity-10 ">
-                          <TableRow>
+                          <TableRow className="hover:bg-transparent">
                             {locationData.SiteRep.Wx.Param.map((param, index) => (
                               <TableHead key={index} className="py-2 text-white">
-                                {param.$} <span className="font-bold">{`(${param.name})`}</span>
+                                {param.$}
+                                {/* <span className="font-bold">{`(${param.name})`}</span> */}
                               </TableHead>
                             ))}
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {period.Rep.map((rep: Record<string, unknown>, repIndex) => (
-                            <TableRow key={`${periodIndex}-${repIndex}`}>
+                            <TableRow key={`${periodIndex}-${repIndex}`} className="hover:bg-transparent">
                               {locationData.SiteRep.Wx.Param.map((param, index) => (
                                 <TableCell className="text-white" key={index}>
-                                  {String(rep[param.name])}
+                                  {param.name === 'D' ? (
+                                    <WindDirection direction={String(rep[param.name])} size={50} />
+                                  ) : param.name === 'W' ? (
+                                    <div className="flex flex-col items-center justify-center text-center">
+                                      {weatherType(rep[param.name] as string)[1]({ size: 40, color: '#fff' })}
+                                      <span className="text-xs" title={rep[param.name] as string}>
+                                        {weatherType(rep[param.name] as string)[0]}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <span>{`${String(rep[param.name])}`}</span>
+                                      <span className="text-xs">{param.units}</span>
+                                    </>
+                                  )}
                                 </TableCell>
                               ))}
                             </TableRow>
@@ -175,9 +142,12 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
               <CarouselNext />
             </div>
           </Carousel>
-          {/* <h5 className="mb-5 inline-block rounded bg-white p-3 py-2 text-center text-xl font-light">
-            Day {current} of {count}
-          </h5> */}
+          <p className="m-4 mt-0 block text-center text-xs text-white">
+            Data provided by{' '}
+            <a href="https://www.metoffice.gov.uk/services/data" target="_blank" className="underline">
+              Met Office
+            </a>
+          </p>
         </div>
       )}
     </>

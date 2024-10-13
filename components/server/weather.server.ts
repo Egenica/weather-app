@@ -52,5 +52,7 @@ export async function getWeatherLocations() {
 
   const data: WeatherLocationsResponse = await res.json();
 
+  //console.log(data.Locations.Location);
+
   return data.Locations.Location;
 }
