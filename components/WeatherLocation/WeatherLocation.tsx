@@ -102,12 +102,11 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                       </h3>
 
                       <Table className="bg-blur mb-5 rounded bg-white bg-opacity-10 backdrop-blur-xl">
-                        <TableHeader className=" bg-white bg-opacity-10 ">
+                        <TableHeader className="sticky top-0 bg-white bg-opacity-10">
                           <TableRow className="hover:bg-transparent">
                             {locationData.SiteRep.Wx.Param.map((param, index) => (
                               <TableHead key={index} className="py-2 text-white">
                                 {param.$}
-                                {/* <span className="font-bold">{`(${param.name})`}</span> */}
                               </TableHead>
                             ))}
                           </TableRow>
