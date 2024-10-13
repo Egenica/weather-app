@@ -34,7 +34,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         } else {
           setLocationData(data);
           setWeatherNow(data.SiteRep.DV.Location.Period[0].Rep[0]);
-          console.log('data', data);
+          // console.log('data', data);
         }
       });
     }
@@ -53,7 +53,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     });
   }, [api]);
 
-  console.log('locationData', locationData);
+  // console.log('locationData', locationData);
 
   const displayDate = (period: string) => {
     const dateFix = period.replace(/Z/g, '');
@@ -73,7 +73,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     return <div>Loading...</div>;
   }
 
-  console.log('locationData', locationData);
+  // console.log('locationData', locationData);
 
   return (
     <>
