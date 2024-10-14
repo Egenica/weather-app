@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/carousel';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { WeatherReportNow } from 'app/types/types';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 
 import { TodaysWeather } from '../TodaysWeather/TodaysWeather';
 import { weatherType } from '../TodaysWeather/weatherType';
@@ -69,6 +69,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
+  const dataTracker = useRef(false);
 
   useEffect(() => {
     if (id) {
@@ -76,7 +77,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         if (Array.isArray(data)) {
           console.error('Expected Location object but received array');
         } else {
-          console.log('location data:', data.SiteRep.DV.Location.Period);
+          // console.log('location data:', data.SiteRep.DV.Location.Period);
           // add date to data.Wx.Param
           data.SiteRep.Wx.Param.push({
             $: 'date',
@@ -94,7 +95,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         if (Array.isArray(data)) {
           console.error('Expected Location object but received array');
         } else {
-          console.log('time stamps data:', data.Resource.TimeSteps.TS);
+          // console.log('time stamps data:', data.Resource.TimeSteps.TS);
           setTimeStampsData(data);
         }
       });
@@ -106,7 +107,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
       timeStampsData &&
       timeStampsData.Resource.TimeSteps.TS.length > 0 &&
       locationData &&
-      locationData.SiteRep.DV.Location.Period.length > 0
+      locationData.SiteRep.DV.Location.Period.length > 0 &&
+      !dataTracker.current // Only run the mapping logic once
     ) {
       const mappedData = mapDatesToData(locationData.SiteRep.DV.Location.Period, timeStampsData.Resource.TimeSteps.TS);
 
@@ -128,8 +130,10 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         }
         return prev;
       });
+
+      dataTracker.current = true; // Set ref to true after the data has been processed
     }
-  }, [timeStampsData]);
+  }, [timeStampsData, locationData]);
 
   useEffect(() => {
     if (!api) {
