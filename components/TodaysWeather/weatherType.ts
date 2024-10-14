@@ -37,9 +37,9 @@ export const weatherType = (weatherNow: string) => {
     case '1':
       return ['Sunny day', WiDaySunny];
     case '2':
-      return ['Partly cloudy (night)', WiNightAltPartlyCloudy];
+      return ['Partly cloudy ', WiNightAltPartlyCloudy];
     case '3':
-      return ['Partly cloudy (day)', WiDayCloudy];
+      return ['Partly cloudy ', WiDayCloudy];
     case '5':
       return ['Mist', WiFog];
     case '6':
@@ -49,47 +49,47 @@ export const weatherType = (weatherNow: string) => {
     case '8':
       return ['Overcast', WiDaySunnyOvercast];
     case '9':
-      return ['Light rain shower (night)', WiNightRainMix];
+      return ['Light rain shower ', WiNightRainMix];
     case '10':
-      return ['Light rain shower (day)', WiDayRainMix];
+      return ['Light rain shower ', WiDayRainMix];
     case '11':
       return ['Drizzle', WiRainMix];
     case '12':
       return ['Light rain', WiRainMix];
     case '13':
-      return ['Heavy rain shower (night)', WiNightAltRain];
+      return ['Heavy rain shower ', WiNightAltRain];
     case '14':
-      return ['Heavy rain shower (day)', WiDayRain];
+      return ['Heavy rain shower ', WiDayRain];
     case '15':
       return ['Heavy rain', WiRain];
     case '16':
-      return ['Sleet shower (night)', WiNightAltSleet];
+      return ['Sleet shower ', WiNightAltSleet];
     case '17':
-      return ['Sleet shower (day)', WiDaySleet];
+      return ['Sleet shower ', WiDaySleet];
     case '18':
       return ['Sleet', WiSleet];
     case '19':
-      return ['Hail shower (night)', WiNightAltHail];
+      return ['Hail shower ', WiNightAltHail];
     case '20':
-      return ['Hail shower (day)', WiDayHail];
+      return ['Hail shower ', WiDayHail];
     case '21':
       return ['Hail', WiHail];
     case '22':
-      return ['Light snow shower (night)', WiNightAltSnow];
+      return ['Light snow shower ', WiNightAltSnow];
     case '23':
-      return ['Light snow shower (day)', WiDaySnow];
+      return ['Light snow shower ', WiDaySnow];
     case '24':
       return ['Light snow', WiSnow];
     case '25':
-      return ['Heavy snow shower (night)', WiNightAltSnowWind];
+      return ['Heavy snow shower ', WiNightAltSnowWind];
     case '26':
-      return ['Heavy snow shower (day)', WiDaySnowWind];
+      return ['Heavy snow shower ', WiDaySnowWind];
     case '27':
       return ['Heavy snow', WiSnowWind];
     case '28':
-      return ['Thunder shower (night)', WiNightAltThunderstorm];
+      return ['Thunder shower ', WiNightAltThunderstorm];
     case '29':
-      return ['Thunder shower (day)', WiDayThunderstorm];
+      return ['Thunder shower ', WiDayThunderstorm];
     case '30':
       return ['Thunder', WiThunderstorm];
     default:
