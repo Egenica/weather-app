@@ -76,6 +76,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         if (Array.isArray(data)) {
           console.error('Expected Location object but received array');
         } else {
+          console.log('location data:', data.SiteRep.DV.Location.Period);
           // add date to data.Wx.Param
           data.SiteRep.Wx.Param.push({
             $: 'date',
@@ -93,6 +94,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         if (Array.isArray(data)) {
           console.error('Expected Location object but received array');
         } else {
+          console.log('time stamps data:', data.Resource.TimeSteps.TS);
           setTimeStampsData(data);
         }
       });
@@ -192,9 +194,11 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                         <TableHeader className="bg-white bg-opacity-10">
                           <TableRow className="hover:bg-transparent">
                             <TableHead className="py-2 text-white">Date & Time</TableHead>
+                            <TableHead className="py-2 text-white">Weather Type</TableHead>
                             {locationData.SiteRep.Wx.Param.map(
                               (param, index) =>
-                                param.name !== 'date' && (
+                                param.name !== 'date' &&
+                                param.name !== 'W' && (
                                   <TableHead key={index} className="py-2 text-white">
                                     {param.$}
                                   </TableHead>
@@ -205,22 +209,32 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                         <TableBody>
                           {period.Rep.map((rep: Record<string, unknown>, repIndex) => (
                             <TableRow key={`${periodIndex}-${repIndex}`} className="hover:bg-transparent">
+                              <TableCell className="whitespace-nowrap text-white">
+                                {new Date(rep.date as string).toLocaleString('en-GB', {
+                                  // weekday: 'short',
+                                  // year: 'numeric',
+                                  // month: 'short',
+                                  // day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: 'numeric',
+                                  hour12: true,
+                                })}
+                              </TableCell>
                               <TableCell className="text-white">
-                                {new Date(rep.date as string).toLocaleString()}
+                                <div className="relative left-[-0.5rem] flex flex-col items-center justify-center text-center">
+                                  {weatherType(rep['W'] as string)[1]({ size: 40, color: '#fff' })}
+                                  <span className="text-xs" title={rep['W'] as string}>
+                                    {weatherType(rep['W'] as string)[0]}
+                                  </span>
+                                </div>
                               </TableCell>
                               {locationData.SiteRep.Wx.Param.map(
                                 (param, index) =>
-                                  param.name !== 'date' && (
+                                  param.name !== 'date' &&
+                                  param.name !== 'W' && (
                                     <TableCell className="text-white" key={index}>
                                       {param.name === 'D' ? (
                                         <WindDirection direction={String(rep[param.name])} size={50} />
-                                      ) : param.name === 'W' ? (
-                                        <div className="flex flex-col items-center justify-center text-center">
-                                          {weatherType(rep[param.name] as string)[1]({ size: 40, color: '#fff' })}
-                                          <span className="text-xs" title={rep[param.name] as string}>
-                                            {weatherType(rep[param.name] as string)[0]}
-                                          </span>
-                                        </div>
                                       ) : (
                                         <>
                                           <span>{`${String(rep[param.name])}`}</span>

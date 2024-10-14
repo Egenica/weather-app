@@ -32,8 +32,10 @@ export const WindDirection = ({ direction, size }: { direction: string | undefin
       return <WiDirectionDownRight size={size} color="#fff" />;
     case 'SSE':
       return <WiDirectionDownRight size={size} color="#fff" />;
+    case 'SW':
+      return <WiDirectionDownLeft size={size} color="#fff" />;
     case 'SSW':
-      return <WiDirectionDownRight size={size} color="#fff" />;
+      return <WiDirectionDownLeft size={size} color="#fff" />;
     case 'E':
       return <WiDirectionRight size={size} color="#fff" />;
     case 'ENE':
