@@ -16,6 +16,7 @@ export type Location = {
             U: string;
             V: string;
             W: string;
+            date?: string;
           }>;
           type: string;
           value: string;
@@ -43,6 +44,28 @@ export type Location = {
 
 type WeatherLocationDataProps = {
   id: string | null;
+};
+
+// type TimeStampsDataProps = {
+//   Resource: {
+//     dataData: string;
+//     res: string;
+//     type: string;
+//     TimeSteps: {
+//       TS: string[];
+//     };
+//   };
+// };
+
+export type TimeStampsDataProps = {
+  Resource: {
+    dataDate: string;
+    res: string;
+    type: string;
+    TimeSteps: {
+      TS: Array<string>;
+    };
+  };
 };
 
 // export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
@@ -84,6 +107,18 @@ export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
   const data: Location = await res.json();
 
   //console.log(data);
+
+  return data;
+}
+
+export async function getTimeStampsData() {
+  const res = await fetch(
+    `http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/capabilities?res=3hourly&key=5df7f8b3-a40e-4294-8e05-ce08618aca19`,
+  );
+
+  const data: TimeStampsDataProps = await res.json();
+
+  console.log(data);
 
   return data;
 }
