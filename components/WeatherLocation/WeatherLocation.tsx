@@ -135,18 +135,18 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     }
   }, [timeStampsData, locationData]);
 
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!api) {
+  //     return;
+  //   }
 
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
+  //   setCount(api.scrollSnapList().length);
+  //   setCurrent(api.selectedScrollSnap() + 1);
 
-    api.on('select', () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
+  //   api.on('select', () => {
+  //     setCurrent(api.selectedScrollSnap() + 1);
+  //   });
+  // }, [api]);
 
   const displayDate = (period: string) => {
     const dateFix = period.replace(/Z/g, '');
