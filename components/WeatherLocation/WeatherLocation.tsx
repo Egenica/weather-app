@@ -214,11 +214,17 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                           {period.Rep.map((rep: Record<string, unknown>, repIndex) => (
                             <TableRow key={`${periodIndex}-${repIndex}`} className="hover:bg-transparent">
                               <TableCell className="whitespace-nowrap text-white">
-                                {new Date(rep.date as string).toLocaleString('en-GB', {
+                                {/* {new Date(rep.date as string).toLocaleString('en-GB', {
                                   // weekday: 'short',
                                   // year: 'numeric',
                                   // month: 'short',
                                   // day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: 'numeric',
+                                  hour12: true,
+                                })} */}
+                                {new Date(rep.date as string).toLocaleString('en-GB', {
+                                  weekday: 'short',
                                   hour: 'numeric',
                                   minute: 'numeric',
                                   hour12: true,

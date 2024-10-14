@@ -102,6 +102,9 @@ export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
   // If the data is not in session storage, fetch it
   const res = await fetch(
     `http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/${id}?res=3hourly&key=5df7f8b3-a40e-4294-8e05-ce08618aca19`,
+    {
+      cache: 'no-store',
+    },
   );
 
   const data: Location = await res.json();
@@ -114,6 +117,9 @@ export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
 export async function getTimeStampsData() {
   const res = await fetch(
     `http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/capabilities?res=3hourly&key=5df7f8b3-a40e-4294-8e05-ce08618aca19`,
+    {
+      cache: 'no-store',
+    },
   );
 
   const data: TimeStampsDataProps = await res.json();
