@@ -59,12 +59,12 @@ type WeatherLocationDataProps = {
 
 export type TimeStampsDataProps = {
   Resource: {
-    dataDate: string;
-    res: string;
-    type: string;
     TimeSteps: {
       TS: Array<string>;
     };
+    dataDate: string;
+    res: string;
+    type: string;
   };
 };
 
@@ -97,7 +97,7 @@ export type TimeStampsDataProps = {
 export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
   // Try to get the data from session storage
   // const storedData = sessionStorage.getItem('location');
-  const storedData = null;
+  // const storedData = null;
 
   // If the data is not in session storage, fetch it
   const res = await fetch(
@@ -118,7 +118,7 @@ export async function getTimeStampsData() {
 
   const data: TimeStampsDataProps = await res.json();
 
-  console.log(data);
+  //console.log(data);
 
   return data;
 }

@@ -25,10 +25,8 @@ import {
   WiRainMix,
   WiSleet,
   WiSnow,
-  WiSnowWind,
-  WiStrongWind,
-  WiThunderstorm,
-  WiWindy,
+  WiSnowWind, //WiStrongWind,
+  WiThunderstorm, //WiWindy,
 } from 'weather-icons-react';
 
 export const weatherType = (weatherNow: string) => {

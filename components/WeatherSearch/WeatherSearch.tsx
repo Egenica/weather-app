@@ -18,7 +18,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
   const [locations, setLocations] = useState<WeatherLocationT[] | null>(null);
   const [filteredLocations, setFilteredLocations] = useState<WeatherLocationT[] | null>(null);
   const [placeholder, setPlaceholder] = useState('Search locations...');
-  const [showScroll, setShowScroll] = useState(false);
+  const [, setShowScroll] = useState(false);
 
   useEffect(() => {
     getWeatherLocations().then((data) => setLocations(data));
