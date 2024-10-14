@@ -173,6 +173,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
       {locationData && (
         <div className="mx-0 md:mx-10">
           <TodaysWeather weatherNow={weatherNow} />
+          <h2 className="mt-8 text-left text-xl font-bold text-white">5 Day Forcast</h2>
           <Carousel
             opts={{
               align: 'start',
