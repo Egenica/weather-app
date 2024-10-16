@@ -1,6 +1,11 @@
+'use client';
+
+import { weatherType } from '@/components/TodaysWeather/weatherType';
 import { cn } from '@/lib/utils';
 import '@/styles/globals.css';
 import { Inter as FontSans } from 'next/font/google';
+
+// import { useEffect } from 'react';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -8,13 +13,19 @@ const fontSans = FontSans({
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const weatherNow = JSON.parse(localStorage.getItem('weatherNow') as string);
+
+  console.log(weatherNow);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
         className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
         style={{
-          background: 'url(/snow_coming_down_from_night_sky_with_stars.jpeg)',
+          background: weatherNow
+            ? `url(${weatherType(weatherNow.W)[2]})`
+            : 'url(/_b4a7eda0-a610-4e40-bf9e-7b17fbafe334.jpeg)',
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
         }}

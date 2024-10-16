@@ -85,7 +85,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
           setLocationData(data);
 
           // set the weather now based on the date
-
+          // set data to local storage
+          localStorage.setItem('weatherNow', JSON.stringify(data.SiteRep.DV.Location.Period[0].Rep[0]));
           // console.log('data', data.SiteRep.DV.Location.Period[0].Rep[0]);
           setWeatherNow(data.SiteRep.DV.Location.Period[0].Rep[0]);
         }
@@ -134,6 +135,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
       dataTracker.current = true; // Set ref to true after the data has been processed
     }
   }, [timeStampsData, locationData]);
+
+  console.log('locationData', locationData);
 
   const displayDate = (period: string) => {
     const dateFix = period.replace(/Z/g, '');
