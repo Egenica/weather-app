@@ -246,7 +246,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
               <CarouselNext className="absolute -right-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full" />
             </div>
           </Carousel>
-          <p className="m-4 mt-0 block text-center text-xs text-white">
+          <p className="block p-4 pt-0 text-center text-xs text-white">
             Data provided by{' '}
             <a href="https://www.metoffice.gov.uk/services/data" target="_blank" className="underline">
               Met Office
