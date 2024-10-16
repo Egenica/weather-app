@@ -21,7 +21,18 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
   const [, setShowScroll] = useState(false);
 
   useEffect(() => {
-    getWeatherLocations().then((data) => setLocations(data));
+    // get locations from local storage
+    const locations = localStorage.getItem('locations');
+
+    if (locations) {
+      setLocations(JSON.parse(locations));
+    } else {
+      getWeatherLocations().then((data) => {
+        // set locations to local storage
+        localStorage.setItem('locations', JSON.stringify(data));
+        setLocations(data);
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -82,7 +93,10 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
                   <Button
                     variant={'link'}
                     className="block h-auto w-full text-xl font-light text-white hover:bg-slate-100 hover:text-black"
-                    onClick={() => setLocation(location)}
+                    onClick={() => {
+                      setLocation(location);
+                      localStorage.setItem('location', JSON.stringify(location && location));
+                    }}
                     title={location?.name}
                   >
                     {isTabletOrMobile && location?.name.length > 20

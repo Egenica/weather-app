@@ -4,12 +4,27 @@ import { MiniNav } from '@/components/MiniNav/MiniNav';
 import { WeatherLocation } from '@/components/WeatherLocation/WeatherLocation';
 import WeatherSearch from '@/components/WeatherSearch/WeatherSearch';
 import { WeatherLocationT } from '@/components/server/weather.server';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [location, setLocation] = useState<WeatherLocationT | null>(null);
 
   // if (location) console.log('location', location);
+
+  // save location to local storage
+  // useEffect
+
+  useEffect(() => {
+    // get location from local storage
+
+    // localStorage.setItem('location', JSON.stringify(location && location?.id));
+
+    const LocalLocation = localStorage.getItem('location');
+    if (LocalLocation) {
+      console.log('LocalLocation', LocalLocation);
+      setLocation(JSON.parse(LocalLocation));
+    }
+  }, []);
 
   return (
     <div>
