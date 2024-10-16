@@ -83,6 +83,10 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
           });
 
           setLocationData(data);
+
+          // set the weather now based on the date
+
+          // console.log('data', data.SiteRep.DV.Location.Period[0].Rep[0]);
           setWeatherNow(data.SiteRep.DV.Location.Period[0].Rep[0]);
         }
       });
