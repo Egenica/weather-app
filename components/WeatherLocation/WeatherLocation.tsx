@@ -136,7 +136,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     }
   }, [timeStampsData, locationData]);
 
-  console.log('locationData', locationData);
+  // console.log('locationData', locationData);
 
   const displayDate = (period: string) => {
     const dateFix = period.replace(/Z/g, '');
