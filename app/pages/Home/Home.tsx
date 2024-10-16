@@ -9,19 +9,10 @@ import { useEffect, useState } from 'react';
 export default function Home() {
   const [location, setLocation] = useState<WeatherLocationT | null>(null);
 
-  // if (location) console.log('location', location);
-
-  // save location to local storage
-  // useEffect
-
   useEffect(() => {
     // get location from local storage
-
-    // localStorage.setItem('location', JSON.stringify(location && location?.id));
-
     const LocalLocation = localStorage.getItem('location');
     if (LocalLocation) {
-      console.log('LocalLocation', LocalLocation);
       setLocation(JSON.parse(LocalLocation));
     }
   }, []);
