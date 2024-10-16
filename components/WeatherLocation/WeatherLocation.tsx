@@ -66,9 +66,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
   const [locationData, setLocationData] = useState<Location | null>(null);
   const [timeStampsData, setTimeStampsData] = useState<TimeStampsDataProps | null>(null);
   const [weatherNow, setWeatherNow] = useState<WeatherReportNow | null>(null);
-  const [api, setApi] = React.useState<CarouselApi>();
-  const [current, setCurrent] = React.useState(0);
-  const [count, setCount] = React.useState(0);
+  const [, setApi] = React.useState<CarouselApi>();
+
   const dataTracker = useRef(false);
 
   useEffect(() => {
@@ -77,8 +76,6 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
         if (Array.isArray(data)) {
           console.error('Expected Location object but received array');
         } else {
-          // console.log('location data:', data.SiteRep.DV.Location.Period);
-          // add date to data.Wx.Param
           data.SiteRep.Wx.Param.push({
             $: 'date',
             name: 'date',
@@ -87,15 +84,14 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
 
           setLocationData(data);
           setWeatherNow(data.SiteRep.DV.Location.Period[0].Rep[0]);
-          // console.log('location data:', data);
         }
       });
+
       // get time stamps for the weather data
       getTimeStampsData().then((data) => {
         if (Array.isArray(data)) {
           console.error('Expected Location object but received array');
         } else {
-          // console.log('time stamps data:', data.Resource.TimeSteps.TS);
           setTimeStampsData(data);
         }
       });
@@ -135,19 +131,6 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
     }
   }, [timeStampsData, locationData]);
 
-  // useEffect(() => {
-  //   if (!api) {
-  //     return;
-  //   }
-
-  //   setCount(api.scrollSnapList().length);
-  //   setCurrent(api.selectedScrollSnap() + 1);
-
-  //   api.on('select', () => {
-  //     setCurrent(api.selectedScrollSnap() + 1);
-  //   });
-  // }, [api]);
-
   const displayDate = (period: string) => {
     const dateFix = period.replace(/Z/g, '');
     const periodDate = new Date(dateFix);
@@ -165,8 +148,6 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
   if (!locationData) {
     return <div>Loading...</div>;
   }
-
-  // console.log('locationData', locationData);
 
   return (
     <>
@@ -189,10 +170,7 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                     <CarouselItem>
                       <h3 className="mb-5 mt-5 flex flex-row items-center justify-center rounded bg-white p-3 py-2 text-center text-base font-light md:inline-block md:text-left md:text-xl ">
                         <CarouselPrevious className="relative mr-auto" />
-                        <span className="mx-3 inline-block">
-                          {displayDate(period.value)}
-                          {/* - Day {current} of {count} */}
-                        </span>
+                        <span className="mx-3 inline-block">{displayDate(period.value)}</span>
                         <CarouselNext className="relative ml-auto" />
                       </h3>
 
@@ -216,15 +194,6 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
                           {period.Rep.map((rep: Record<string, unknown>, repIndex) => (
                             <TableRow key={`${periodIndex}-${repIndex}`} className="hover:bg-transparent">
                               <TableCell className="whitespace-nowrap text-white">
-                                {/* {new Date(rep.date as string).toLocaleString('en-GB', {
-                                  // weekday: 'short',
-                                  // year: 'numeric',
-                                  // month: 'short',
-                                  // day: 'numeric',
-                                  hour: 'numeric',
-                                  minute: 'numeric',
-                                  hour12: true,
-                                })} */}
                                 {new Date(rep.date as string).toLocaleString('en-GB', {
                                   weekday: 'short',
                                   hour: 'numeric',
@@ -266,8 +235,8 @@ export const WeatherLocation = ({ id }: WeatherLocationProps) => {
               })}
             </CarouselContent>
             <div className="hidden md:block">
-              <CarouselPrevious />
-              <CarouselNext />
+              <CarouselPrevious className="absolute -left-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full" />
+              <CarouselNext className="absolute -right-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full" />
             </div>
           </Carousel>
           <p className="m-4 mt-0 block text-center text-xs text-white">

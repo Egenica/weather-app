@@ -114,6 +114,29 @@ export async function getWeatherLocationData({ id }: WeatherLocationDataProps) {
   return data;
 }
 
+export async function getCurrentLocationData({ id }: WeatherLocationDataProps) {
+  // Try to get the data from session storage
+  // const storedData = sessionStorage.getItem('location');
+  // const storedData = null;
+
+  console.log('id', id);
+
+  // If the data is not in session storage, fetch it
+
+  const res = await fetch(
+    `http://datapoint.metoffice.gov.uk/public/data/val/wxobs/all/json/${id}?res=hourly&key=5df7f8b3-a40e-4294-8e05-ce08618aca19`,
+    {
+      cache: 'no-store',
+    },
+  );
+
+  const data: Location = await res.json();
+
+  //console.log(data);
+
+  return data;
+}
+
 export async function getTimeStampsData() {
   const res = await fetch(
     `http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/capabilities?res=3hourly&key=5df7f8b3-a40e-4294-8e05-ce08618aca19`,
