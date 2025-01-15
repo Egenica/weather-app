@@ -2,25 +2,25 @@
 
 A fun little weather app that uses all the modern frontend / backend frameworks with NextJs / Tailwind / Typescript.
 
-## API Link
+### API Link
 
 - https://www.metoffice.gov.uk/services/data/datapoint
 
-## Run Dev
+### Run Dev
 
 `npm run dev`
 
-## Run Production
+### Run Production
 
 `npm run build`
 
 `npm run start`
 
-## Run Test
+### Run Test
 
 `npm run test`
 
-# Features
+## Features
 
 - Location search.
 - 5 day forcast by the Met Office data API.
