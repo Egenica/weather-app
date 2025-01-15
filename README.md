@@ -1,5 +1,7 @@
 # Weather App - Using Met Office API (W.I.P)
 
+A fun little weather app that uses all the modern frontend / backend frameworks with NextJs / Tailwind / Typescript.
+
 ## API Link
 
 - https://www.metoffice.gov.uk/services/data/datapoint
