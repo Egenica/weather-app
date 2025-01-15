@@ -4,7 +4,7 @@ import Home from './pages/Home/Home';
 // import WeatherSearch from '@/components/WeatherSearch/WeatherSearch';
 
 export const metadata = {
-  title: 'Weather App',
+  title: '5 Day forcast - Weather App',
   description: 'Dynamic Weather App',
 };
 
