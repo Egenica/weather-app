@@ -37,3 +37,4 @@ Run Test
 - Some wind direction icons might not be showing
 - Currently the background can get stuck between viewing sessions and refreshin again fixes it but needs look into (there's some kind of caching going on, it might be a local storage issue, needs investigating)
 - There might be weather conditions where the there are no icons but I havent seen that yet
+- Code test coverage needs adding
