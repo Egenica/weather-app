@@ -43,3 +43,4 @@ A fun little weather app that uses all the modern frontend / backend frameworks 
 - Maybe the background should change based on the current day fade out old in new but could be a bit clunky - Might need to test locally.
 - Background isn't updated if location is changed until page has manually been refreshed.
 - I think the location Todmorden is the only location currently that has dynamic backgrounds so other locations will need to be added and backgrounds created. Microsoft AI image gen -> https://copilot.microsoft.com/images/create
+- All weather conditions aren't currently covered with background images so can display an incorrect image aka a default which isn't ideal
