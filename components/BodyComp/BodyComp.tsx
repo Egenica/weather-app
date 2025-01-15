@@ -20,7 +20,7 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
       style={{
         background: weatherNow
           ? `url(${weatherType(weatherNow.W)[2]})`
-          : 'url(/_b4a7eda0-a610-4e40-bf9e-7b17fbafe334.jpeg)',
+          : 'url(/_fcf1d22e-7641-4978-ba2a-02aa3218c2ab.jpeg)',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
       }}

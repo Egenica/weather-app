@@ -33,9 +33,9 @@ export const weatherType = (weatherNow: string) => {
   //console.log('weatherNow', weatherNow);
   switch (weatherNow) {
     case '0':
-      return ['Clear night', WiNightClear, '/_b4a7eda0-a610-4e40-bf9e-7b17fbafe334.jpeg'];
+      return ['Clear night', WiNightClear, '/_f54531db-936a-4db3-9923-a9e1f25a37f6.jpeg'];
     case '1':
-      return ['Sunny day', WiDaySunny, '/_d2f29571-7dcf-4ac5-a329-263ff65d1e3b.jpeg'];
+      return ['Sunny day', WiDaySunny, '/_49876d2a-adc0-4ce5-8bde-5fc833e0fce1.jpeg'];
     case '2':
       return ['Partly cloudy ', WiNightAltPartlyCloudy, '/_3edd4b9f-fb06-4757-a32f-bb1cfa01b9e0.jpeg'];
     case '3':
