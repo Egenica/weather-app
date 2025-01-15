@@ -38,3 +38,4 @@
 - Currently, the background can get stuck between viewing sessions; refreshing again fixes it, but this needs to be looked into (there's some kind of caching going on—it might be a local storage issue and needs investigation).
 - There might be weather conditions where there are no icons, but I haven't seen that yet.
 - Code test coverage needs to be added.
+- Maybe the background should change based on the current day fade out old in new but could be a bit clunky - Might need to test locally.
