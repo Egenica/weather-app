@@ -27,7 +27,7 @@ A fun little weather app that uses all the modern frontend / backend frameworks 
 - Uses NextJs / Typescript / Tailwind.
 - Backend server API for data.
 - Background changes depending on time of day and weather conditions.
-- Location is saved in local storage for.
+- Location is saved in local storage.
 
 ## ToDo
 
