@@ -29,7 +29,7 @@ A fun little weather app that uses all the modern frontend / backend frameworks 
 - Background changes depending on time of day and weather conditions.
 - Location is saved in local storage for.
 
-# ToDo
+## ToDo
 
 - Tests need updating/adding to some sections.
 - Currently, the 'Now at a glance' feature uses the first row of data, so it's not time-accurate unless it's in the morning. This was added as a "nice to have" feature but needs to be made time-accurate.
