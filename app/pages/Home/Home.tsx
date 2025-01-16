@@ -13,9 +13,10 @@ export default function Home() {
       setTimeout(() => {
         window.location.reload(); // Refresh the page
         resolve();
-      }, 1000); // Simulate a 1-second delay for the refresh
+      }, 500);
     });
   };
+
   const [location, setLocation] = useState<WeatherLocationT | null>(null);
 
   useEffect(() => {
