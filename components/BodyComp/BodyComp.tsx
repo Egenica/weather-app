@@ -17,7 +17,7 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className={cn('bg-background font-sans antialiased', fontSans.variable)}
+      className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
       style={{
         background: weatherNow
           ? `url(${weatherType(weatherNow.W)[2]})`
