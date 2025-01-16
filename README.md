@@ -23,6 +23,7 @@ A fun little weather app that uses all the modern frontend / backend frameworks 
 ## Features
 
 - Location search.
+- PWA Application, install as an 'App' to iPhone and android (https://www.youtube.com/watch?v=AwfKUpq5seE).
 - 5 day forcast by the Met Office data API.
 - Uses NextJs / Typescript / Tailwind.
 - Backend server API for data.
