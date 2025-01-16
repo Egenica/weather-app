@@ -9,13 +9,13 @@ const BodyComp = dynamic(() => import('@/components/BodyComp/BodyComp'), {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ background: '#000' }}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
         <link rel="apple-touch-icon" href="/icons/iOs-Icon.png" />
       </head>
-      <body>
+      <body style={{ overscrollBehavior: 'none', background: '#000' }}>
         <BodyComp>{children}</BodyComp>
       </body>
     </html>

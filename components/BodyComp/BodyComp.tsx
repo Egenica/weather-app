@@ -25,7 +25,7 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
   // console.log(weatherNow);
 
   return (
-    <PullToRefresh onRefresh={handleRefresh} style={{ height: '100vh', overflow: 'auto' }}>
+    <PullToRefresh onRefresh={handleRefresh} style={{ height: '100vh', overflow: 'auto', overscrollBehavior: 'auto' }}>
       <div
         className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
         style={{
