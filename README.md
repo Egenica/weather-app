@@ -6,6 +6,10 @@ A fun little weather app that uses all the modern frontend / backend frameworks 
 
 - https://www.metoffice.gov.uk/services/data/datapoint
 
+### Install Deps
+
+`npm i`
+
 ### Run Dev
 
 `npm run dev`
