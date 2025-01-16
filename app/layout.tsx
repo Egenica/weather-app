@@ -15,7 +15,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="theme-color" content="#000000" />
         <link rel="apple-touch-icon" href="/icons/iOs-Icon.png" />
       </head>
-      <body style={{ overscrollBehavior: 'none', background: '#000' }}>
+      <body style={{ background: '#000' }}>
         <BodyComp>{children}</BodyComp>
       </body>
     </html>
