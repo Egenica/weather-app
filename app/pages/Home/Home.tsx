@@ -7,6 +7,21 @@ import { WeatherLocationT } from '@/components/server/weather.server';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('App resumed, checking for updates...');
+        window.location.reload();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   const [location, setLocation] = useState<WeatherLocationT | null>(null);
 
   useEffect(() => {
