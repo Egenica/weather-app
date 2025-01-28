@@ -13,9 +13,9 @@ afterEach(() => {
 });
 
 describe('Page', () => {
-  it('renders the Home component', () => {
-    render(<Home data-testid="home" />);
-    const homeElement = screen.getByTestId('home');
+  it('renders the Home component', async () => {
+    render(<Home />);
+    const homeElement = await screen.getByTestId('home');
     expect(homeElement).toBeInTheDocument();
   });
 });

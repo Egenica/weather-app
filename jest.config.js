@@ -10,6 +10,9 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
+  moduleNameMapper: {
+    '^weather-icons-react$': '<rootDir>/__mocks__/weather-icons-react.js', // Direct Jest to your mock
+  },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

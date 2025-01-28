@@ -33,7 +33,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
+    <div data-testid="home">
       <MiniNav data-testid="mini-nav" location={location} setLocation={setLocation} />
       <div className="container">
         {!location ? (

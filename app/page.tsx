@@ -9,9 +9,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return (
-    <>
-      <Home data-testid="home" />
-    </>
-  );
+  return <Home />;
 }
