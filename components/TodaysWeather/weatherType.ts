@@ -63,7 +63,7 @@ export const weatherType = (weatherNow: string) => {
     case '15':
       return ['Heavy rain', WiRain, '/_b4a7eda0-a610-4e40-bf9e-7b17fbafe334.jpeg'];
     case '16':
-      return ['Sleet shower ', WiNightAltSleet, '/_6d3f49ce-d11f-4b52-85ab-65d34384aa46.jpeg'];
+      return ['Sleet shower ', WiNightAltSleet, '/_b1ba0af7-1a4f-4e50-9653-494e53b3d639.jpeg'];
     case '17':
       return ['Sleet shower ', WiDaySleet, '/_82f9771e-70a3-44e1-b969-dd86a95fbea8.jpeg'];
     case '18':
@@ -75,13 +75,13 @@ export const weatherType = (weatherNow: string) => {
     case '21':
       return ['Hail', WiHail, '/_da9c488b-07de-4f89-a2fe-29a3e9fa9426.jpeg'];
     case '22':
-      return ['Light snow shower ', WiNightAltSnow, ''];
+      return ['Light snow shower ', WiNightAltSnow, '/_ca970971-da6c-43b7-b46e-2eb65cc270d4.jpeg'];
     case '23':
       return ['Light snow shower ', WiDaySnow, '/_ca970971-da6c-43b7-b46e-2eb65cc270d4.jpeg'];
     case '24':
       return ['Light snow', WiSnow, '/_2562ff75-e389-4564-b3ee-1b1c92fa302e.jpeg'];
     case '25':
-      return ['Heavy snow shower', WiNightAltSnowWind, '_a046888a-1579-4400-8228-804fb79d6560.jpeg'];
+      return ['Heavy snow shower', WiNightAltSnowWind, '/_a046888a-1579-4400-8228-804fb79d6560.jpeg'];
     case '26':
       return ['Heavy snow shower', WiDaySnowWind, '/_99297b3d-8d00-4c52-8ea1-79b76e7f7800.jpeg'];
     case '27':

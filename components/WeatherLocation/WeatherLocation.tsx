@@ -14,6 +14,7 @@ import { weatherType } from '../TodaysWeather/weatherType';
 import { WindDirection } from '../WeatherDirection/WeatherDirection';
 
 type WeatherLocationProps = {
+  onDayWeatherChange?: (payload: { date: string; weatherCode: number | null }) => void;
   weatherData: SimplifiedWeather;
 };
 
@@ -131,9 +132,56 @@ function rangeForDay(day: DailyForecast): { max: number | null; min: number | nu
   };
 }
 
-export const WeatherLocation = ({ weatherData }: WeatherLocationProps) => {
-  const [, setApi] = React.useState<CarouselApi>();
+function getDayWeatherCode(day: DailyForecast): number | null {
+  const midday = day.hours.find((hour) => {
+    const value = new Date(hour.timestamp);
+    return !Number.isNaN(value.getTime()) && value.getHours() >= 11 && value.getHours() <= 14;
+  });
+
+  return midday?.weatherCode ?? day.hours[0]?.weatherCode ?? null;
+}
+
+export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLocationProps) => {
+  const [api, setApi] = React.useState<CarouselApi>();
   const nowVisual = getWeatherVisual(weatherData.current.weatherCode);
+
+  React.useEffect(() => {
+    if (!api || typeof window === 'undefined') {
+      return;
+    }
+
+    const applyDayBackground = () => {
+      const selectedIndex = api.selectedScrollSnap();
+      const selectedDay = weatherData.dailyPages[selectedIndex];
+      if (!selectedDay) {
+        return;
+      }
+
+      const selectedCode = getDayWeatherCode(selectedDay);
+      if (selectedCode === null) {
+        return;
+      }
+
+      localStorage.setItem('weatherNow', JSON.stringify({ W: selectedCode }));
+      const hasGeneratedBackground = Boolean(localStorage.getItem('weatherBackgroundImage'));
+      if (!hasGeneratedBackground) {
+        window.dispatchEvent(new Event('weather-background-update'));
+      }
+      onDayWeatherChange?.({
+        date: selectedDay.date,
+        weatherCode: selectedCode,
+      });
+    };
+
+    applyDayBackground();
+    api.on('select', applyDayBackground);
+    api.on('reInit', applyDayBackground);
+
+    return () => {
+      api.off('select', applyDayBackground);
+      api.off('reInit', applyDayBackground);
+    };
+  }, [api, onDayWeatherChange, weatherData.dailyPages]);
 
   return (
     <div className="mx-0 md:mx-10">

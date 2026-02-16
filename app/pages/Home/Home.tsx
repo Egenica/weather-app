@@ -4,13 +4,73 @@ import { MiniNav } from '@/components/MiniNav/MiniNav';
 import { WeatherLocation } from '@/components/WeatherLocation/WeatherLocation';
 import WeatherSearch, { SearchLocation } from '@/components/WeatherSearch/WeatherSearch';
 import { SimplifiedWeather } from '@/lib/server/weather-datahub';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const [location, setLocation] = useState<SearchLocation | null>(null);
   const [weather, setWeather] = useState<SimplifiedWeather | null>(null);
   const [weatherError, setWeatherError] = useState<string | null>(null);
   const [loadingWeather, setLoadingWeather] = useState(false);
+  const lastGeneratedBackgroundKey = useRef<string>('');
+
+  const requestBackgroundImage = (input: {
+    feelsLike: number | null;
+    humidity: number | null;
+    temperature: number | null;
+    variantKey: string;
+    weatherCode: number | null;
+    windSpeed: number | null;
+  }) => {
+    if (!location) {
+      return;
+    }
+
+    const dedupeKey = `${location.name}:${location.adminArea ?? ''}:${location.country}:${input.weatherCode ?? 'unknown'}:${input.variantKey}`;
+    if (lastGeneratedBackgroundKey.current === dedupeKey) {
+      return;
+    }
+
+    lastGeneratedBackgroundKey.current = dedupeKey;
+
+    fetch('/api/background', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        adminArea: location.adminArea,
+        country: location.country,
+        feelsLike: input.feelsLike,
+        humidity: input.humidity,
+        locationName: location.name,
+        temperature: input.temperature,
+        variantKey: input.variantKey,
+        weatherCode: input.weatherCode,
+        windSpeed: input.windSpeed,
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as { imageUrl?: string | null };
+        if (typeof payload.imageUrl === 'string' && payload.imageUrl.length > 0) {
+          localStorage.setItem('weatherBackgroundImage', payload.imageUrl);
+          window.dispatchEvent(new Event('weather-background-update'));
+          return;
+        }
+
+        if (!localStorage.getItem('weatherBackgroundImage')) {
+          window.dispatchEvent(new Event('weather-background-update'));
+        }
+      })
+      .catch(() => {
+        if (!localStorage.getItem('weatherBackgroundImage')) {
+          window.dispatchEvent(new Event('weather-background-update'));
+        }
+      });
+  };
 
   useEffect(() => {
     const localLocation = localStorage.getItem('location');
@@ -49,7 +109,36 @@ export default function Home() {
       .then((data) => {
         setWeather(data);
         localStorage.setItem('weatherNow', JSON.stringify({ W: data.current.weatherCode }));
-        window.dispatchEvent(new Event('weather-background-update'));
+        if (!localStorage.getItem('weatherBackgroundImage')) {
+          window.dispatchEvent(new Event('weather-background-update'));
+        }
+
+        requestBackgroundImage({
+          feelsLike: data.current.feelsLike,
+          humidity: data.current.humidity,
+          temperature: data.current.temperature,
+          variantKey: data.current.timestamp,
+          weatherCode: data.current.weatherCode,
+          windSpeed: data.current.windSpeed,
+        });
+
+        const nextDay = data.dailyPages[1];
+        if (nextDay) {
+          const midday = nextDay.hours.find((hour) => {
+            const value = new Date(hour.timestamp);
+            return !Number.isNaN(value.getTime()) && value.getHours() >= 11 && value.getHours() <= 14;
+          });
+          const representative = midday ?? nextDay.hours[0] ?? data.current;
+
+          requestBackgroundImage({
+            feelsLike: representative.feelsLike,
+            humidity: representative.humidity,
+            temperature: representative.temperature,
+            variantKey: nextDay.date,
+            weatherCode: representative.weatherCode,
+            windSpeed: representative.windSpeed,
+          });
+        }
       })
       .catch((error) => {
         setWeather(null);
@@ -68,6 +157,7 @@ export default function Home() {
         setLocation={() => {
           localStorage.removeItem('location');
           localStorage.removeItem('weatherNow');
+          localStorage.removeItem('weatherBackgroundImage');
           window.dispatchEvent(new Event('weather-background-update'));
           setLocation(null);
           setWeather(null);
@@ -90,7 +180,28 @@ export default function Home() {
             )}
             {loadingWeather && <p className="mt-3 text-center text-white">Loading weather...</p>}
             {weatherError && <p className="mt-3 text-center text-red-200">{weatherError}</p>}
-            {weather && <WeatherLocation weatherData={weather} />}
+            {weather && (
+              <WeatherLocation
+                weatherData={weather}
+                onDayWeatherChange={({ date, weatherCode }) => {
+                  const day = weather.dailyPages.find((item) => item.date === date);
+                  const midday = day?.hours.find((hour) => {
+                    const value = new Date(hour.timestamp);
+                    return !Number.isNaN(value.getTime()) && value.getHours() >= 11 && value.getHours() <= 14;
+                  });
+                  const representative = midday ?? day?.hours[0] ?? weather.current;
+
+                  requestBackgroundImage({
+                    feelsLike: representative.feelsLike,
+                    humidity: representative.humidity,
+                    temperature: representative.temperature,
+                    variantKey: date,
+                    weatherCode,
+                    windSpeed: representative.windSpeed,
+                  });
+                }}
+              />
+            )}
           </>
         )}
       </div>

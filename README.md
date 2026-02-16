@@ -17,6 +17,7 @@ Copy `.env.example` to `.env.local` and add:
 
 ```bash
 METOFFICE_API_KEY=your-datahub-api-key
+HF_API_KEY=your-huggingface-token
 ```
 
 ## DataHub Subscription Checklist
@@ -121,6 +122,13 @@ Response shape:
   ]
 }
 ```
+
+### `POST /api/background`
+
+- Generates weather-aware background images using a free image generation endpoint
+- Input fields: `locationName`, `country`, optional `adminArea`, optional `weatherCode`
+- Response: `{ "imageUrl": "data:image/..." }`
+- Server-side cache: 24 hours keyed by location + weather code
 
 ## Error Handling
 
