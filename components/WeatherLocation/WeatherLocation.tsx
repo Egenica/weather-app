@@ -70,6 +70,40 @@ function isCurrentHour(timestamp: string): boolean {
   );
 }
 
+function isToday(date: string): boolean {
+  const value = new Date(date);
+  const now = new Date();
+
+  return (
+    value.getFullYear() === now.getFullYear() &&
+    value.getMonth() === now.getMonth() &&
+    value.getDate() === now.getDate()
+  );
+}
+
+function getClosestHourTimestamp(hours: DailyForecast['hours']): string | null {
+  if (hours.length === 0) {
+    return null;
+  }
+
+  const now = Date.now();
+  let closest: { diff: number; timestamp: string } | null = null;
+
+  for (const hour of hours) {
+    const hourTime = new Date(hour.timestamp).getTime();
+    if (Number.isNaN(hourTime)) {
+      continue;
+    }
+
+    const diff = Math.abs(hourTime - now);
+    if (!closest || diff < closest.diff) {
+      closest = { diff, timestamp: hour.timestamp };
+    }
+  }
+
+  return closest ? closest.timestamp : null;
+}
+
 function rangeForDay(day: DailyForecast): { max: number | null; min: number | null } {
   const temps = day.hours.map((hour) => hour.temperature).filter((value): value is number => value !== null);
   if (temps.length === 0) {
@@ -145,6 +179,7 @@ export const WeatherLocation = ({ weatherData }: WeatherLocationProps) => {
         <CarouselContent>
           {weatherData.dailyPages.map((day) => {
             const tempRange = rangeForDay(day);
+            const highlightedTimestamp = isToday(day.date) ? getClosestHourTimestamp(day.hours) : null;
 
             return (
               <CarouselItem key={day.date}>
@@ -176,16 +211,30 @@ export const WeatherLocation = ({ weatherData }: WeatherLocationProps) => {
                   <TableBody>
                     {day.hours.map((hour) => {
                       const visual = getWeatherVisual(hour.weatherCode);
-                      const isNow = isCurrentHour(hour.timestamp);
+                      const isNow = highlightedTimestamp
+                        ? hour.timestamp === highlightedTimestamp
+                        : isCurrentHour(hour.timestamp);
 
                       return (
                         <TableRow
                           key={hour.timestamp}
-                          className={isNow ? 'bg-teal-300/15 hover:bg-teal-300/15' : 'hover:bg-transparent'}
+                          className={
+                            isNow ? 'bg-teal-300/30 text-white/95 hover:bg-teal-300/30' : 'hover:bg-transparent'
+                          }
                         >
-                          <TableCell className="whitespace-nowrap text-white">{formatHour(hour.timestamp)}</TableCell>
-                          <TableCell className="text-white">
-                            <div className="relative left-[-0.5rem] flex flex-col items-center justify-center text-center">
+                          <TableCell className="whitespace-nowrap text-white">
+                            <span className="inline-flex items-center gap-2">
+                              {isNow && <span className="h-2 w-2 rounded-full bg-teal-200" aria-hidden="true" />}
+                              <span>{formatHour(hour.timestamp)}</span>
+                              {isNow && (
+                                <span className="rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-black">
+                                  Now
+                                </span>
+                              )}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center text-white">
+                            <div className="mx-auto flex w-full max-w-[120px] flex-col items-center justify-center text-center">
                               {visual.icon ? (
                                 visual.icon({ size: 40, color: '#fff' })
                               ) : (
