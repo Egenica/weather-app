@@ -104,6 +104,22 @@ function getClosestHourTimestamp(hours: DailyForecast['hours']): string | null {
   return closest ? closest.timestamp : null;
 }
 
+function sameHour(timestampA: string, timestampB: string): boolean {
+  const a = new Date(timestampA);
+  const b = new Date(timestampB);
+
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) {
+    return false;
+  }
+
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate() &&
+    a.getHours() === b.getHours()
+  );
+}
+
 function rangeForDay(day: DailyForecast): { max: number | null; min: number | null } {
   const temps = day.hours.map((hour) => hour.temperature).filter((value): value is number => value !== null);
   if (temps.length === 0) {
@@ -179,7 +195,10 @@ export const WeatherLocation = ({ weatherData }: WeatherLocationProps) => {
         <CarouselContent>
           {weatherData.dailyPages.map((day) => {
             const tempRange = rangeForDay(day);
-            const highlightedTimestamp = isToday(day.date) ? getClosestHourTimestamp(day.hours) : null;
+            const highlightedTimestamp = isToday(day.date)
+              ? day.hours.find((hour) => sameHour(hour.timestamp, weatherData.current.timestamp))?.timestamp ??
+                getClosestHourTimestamp(day.hours)
+              : null;
 
             return (
               <CarouselItem key={day.date}>
