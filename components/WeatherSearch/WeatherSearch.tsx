@@ -28,6 +28,8 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
   const [, setShowScroll] = useState(false);
   const [loading, setLoading] = useState(false);
   const [unknownLocation, setUnknownLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     const trimmed = search.trim();
@@ -36,6 +38,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
       setLocations([]);
       setLoading(false);
       setUnknownLocation(false);
+      setLocationError(null);
       return;
     }
 
@@ -43,12 +46,14 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
       setLocations([]);
       setLoading(false);
       setUnknownLocation(false);
+      setLocationError(null);
       return;
     }
 
     const timeout = setTimeout(() => {
       setLoading(true);
       setUnknownLocation(false);
+      setLocationError(null);
       fetch(`/api/geocode?q=${encodeURIComponent(trimmed)}`)
         .then((response) => response.json())
         .then((data) => {
@@ -59,6 +64,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
         .catch(() => {
           setLocations([]);
           setUnknownLocation(false);
+          setLocationError('Unable to search locations right now');
         })
         .finally(() => {
           setLoading(false);
@@ -96,9 +102,64 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
             setSearch('');
             setLocations([]);
             setUnknownLocation(false);
+            setLocationError(null);
           }}
         >
           X
+        </Button>
+      </div>
+      <div className="mx-auto mt-3 w-auto md:w-2/4">
+        <Button
+          type="button"
+          className="w-full rounded-md bg-teal-600 text-white hover:bg-teal-500"
+          onClick={() => {
+            setUnknownLocation(false);
+            setLocationError(null);
+
+            if (!navigator.geolocation) {
+              setLocationError('Geolocation is not supported in this browser');
+              return;
+            }
+
+            setLocating(true);
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const lat = Number(position.coords.latitude.toFixed(5));
+                const lon = Number(position.coords.longitude.toFixed(5));
+
+                setLocation({
+                  adminArea: null,
+                  country: 'United Kingdom',
+                  isRegion: false,
+                  lat,
+                  lon,
+                  name: 'Current location',
+                });
+
+                localStorage.setItem(
+                  'location',
+                  JSON.stringify({
+                    adminArea: null,
+                    country: 'United Kingdom',
+                    isRegion: false,
+                    lat,
+                    lon,
+                    name: 'Current location',
+                  }),
+                );
+
+                setLocating(false);
+              },
+              () => {
+                setLocating(false);
+                setLocationError('Unable to access your current location');
+              },
+              { enableHighAccuracy: true, timeout: 10000 },
+            );
+          }}
+          disabled={locating}
+        >
+          {locating ? 'Finding your location...' : 'Use current location'}
         </Button>
       </div>
       {showLocations && (
@@ -142,6 +203,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
         </ScrollArea>
       )}
       {!loading && unknownLocation && <p className="mt-3 text-sm text-red-200">Unknown location</p>}
+      {locationError && <p className="mt-3 text-sm text-red-200">{locationError}</p>}
     </div>
   );
 }
