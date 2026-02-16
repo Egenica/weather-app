@@ -11,6 +11,7 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
     '^weather-icons-react$': '<rootDir>/__mocks__/weather-icons-react.js', // Direct Jest to your mock
   },
 };

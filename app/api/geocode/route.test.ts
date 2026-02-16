@@ -2,6 +2,15 @@ import { GeocodeUpstreamError, searchUkLocations } from '@/lib/server/geocode';
 
 import { GET } from './route';
 
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: (body: unknown, init: { status?: number } = {}) => ({
+      json: async () => body,
+      status: init.status ?? 200,
+    }),
+  },
+}));
+
 jest.mock('@/lib/server/geocode', () => ({
   GeocodeUpstreamError: class GeocodeUpstreamError extends Error {},
   searchUkLocations: jest.fn(),

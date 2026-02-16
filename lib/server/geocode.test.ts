@@ -1,21 +1,12 @@
 import { sharedCache } from '@/lib/server/cache';
 
-import { getPopularUkLocations, searchUkLocations } from './geocode';
+import { searchUkLocations } from './geocode';
 
 describe('geocode service', () => {
   beforeEach(() => {
     sharedCache.clear();
     jest.resetAllMocks();
     global.fetch = jest.fn();
-  });
-
-  it('returns popular uk locations fallback list', () => {
-    const locations = getPopularUkLocations();
-
-    expect(locations.length).toBeGreaterThan(0);
-    expect(locations[0]).toHaveProperty('name');
-    expect(locations[0]).toHaveProperty('lat');
-    expect(locations[0]).toHaveProperty('lon');
   });
 
   it('maps upstream geocode payload', async () => {
@@ -44,5 +35,15 @@ describe('geocode service', () => {
         name: 'Leeds',
       },
     ]);
+  });
+
+  it('returns built-in UK region for region query', async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ results: [] }),
+    });
+
+    const results = await searchUkLocations('yorkshire');
+    expect(results.some((location) => location.name === 'Yorkshire')).toBe(true);
   });
 });

@@ -19,7 +19,7 @@ export const MiniNav = ({ location, setLocation, ...props }: MiniNavProps) => {
       <nav {...props} className="flex flex-row items-center justify-between p-2 pl-3 pr-3">
         <Button
           variant={'link'}
-          typeof="button"
+          type="button"
           className="text-sm font-normal text-white opacity-50 hover:opacity-100"
           onClick={setLocation}
         >

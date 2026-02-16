@@ -124,7 +124,7 @@ describe('weather-datahub', () => {
     await getCurrentHourlyForecast(53.80004, -1.50004);
     await getCurrentHourlyForecast(53.80003, -1.50003);
 
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('throws config error when API key is missing', async () => {

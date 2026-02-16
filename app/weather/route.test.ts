@@ -2,6 +2,15 @@ import { DataHubConfigError, DataHubUpstreamError, getCurrentHourlyForecast } fr
 
 import { GET } from './route';
 
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: (body: unknown, init: { status?: number } = {}) => ({
+      json: async () => body,
+      status: init.status ?? 200,
+    }),
+  },
+}));
+
 jest.mock('@/lib/server/weather-datahub', () => ({
   DataHubConfigError: class DataHubConfigError extends Error {},
   DataHubUpstreamError: class DataHubUpstreamError extends Error {},
