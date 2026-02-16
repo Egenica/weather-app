@@ -79,6 +79,11 @@ export default function Home() {
         ) : (
           <>
             <h1 className="mb-10 mt-10 text-center text-4xl font-thin text-teal-600">{location.name}</h1>
+            {location.isRegion && (
+              <p className="mb-4 text-center text-xs uppercase tracking-[0.2em] text-teal-100">
+                Regional estimate (centroid-based)
+              </p>
+            )}
             {loadingWeather && <p className="mt-3 text-center text-white">Loading weather...</p>}
             {weatherError && <p className="mt-3 text-center text-red-200">{weatherError}</p>}
             {weather && <WeatherLocation weatherData={weather} />}

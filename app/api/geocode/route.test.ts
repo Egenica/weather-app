@@ -38,7 +38,7 @@ describe('GET /api/geocode', () => {
 
   it('returns upstream locations', async () => {
     (searchUkLocations as jest.Mock).mockResolvedValue([
-      { country: 'United Kingdom', lat: 51.5, lon: -0.12, name: 'London' },
+      { country: 'United Kingdom', isRegion: false, lat: 51.5, lon: -0.12, name: 'London' },
     ]);
 
     const response = await GET(new Request('http://localhost/api/geocode?q=london'));

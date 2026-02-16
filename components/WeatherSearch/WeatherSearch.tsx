@@ -10,6 +10,7 @@ import { useMediaQuery } from 'react-responsive';
 export type SearchLocation = {
   adminArea: string | null;
   country: string;
+  isRegion: boolean;
   lat: number;
   lon: number;
   name: string;
@@ -126,6 +127,11 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
                     <span className="block text-xs opacity-70">
                       {[location.adminArea, location.country].filter(Boolean).join(', ')}
                     </span>
+                    {location.isRegion && (
+                      <span className="mt-1 inline-block rounded bg-teal-200 px-2 py-0.5 text-[10px] uppercase tracking-wide text-black">
+                        Regional estimate
+                      </span>
+                    )}
                   </Button>
                   {i !== locations.length - 1 && <Separator className="my-3 opacity-20" />}
                 </li>

@@ -21,7 +21,9 @@ describe('WeatherSearch', () => {
   it('shows matched locations for query', async () => {
     (fetch as jest.Mock).mockResolvedValue({
       json: jest.fn().mockResolvedValue({
-        locations: [{ adminArea: 'England', country: 'United Kingdom', lat: 53.8, lon: -1.5, name: 'Leeds' }],
+        locations: [
+          { adminArea: 'England', country: 'United Kingdom', isRegion: false, lat: 53.8, lon: -1.5, name: 'Leeds' },
+        ],
       }),
       ok: true,
     });

@@ -17,6 +17,7 @@ describe('geocode service', () => {
           {
             admin1: 'England',
             country: 'United Kingdom',
+            country_code: 'GB',
             latitude: 53.8,
             longitude: -1.55,
             name: 'Leeds',
@@ -30,6 +31,7 @@ describe('geocode service', () => {
       {
         adminArea: 'England',
         country: 'United Kingdom',
+        isRegion: false,
         lat: 53.8,
         lon: -1.55,
         name: 'Leeds',

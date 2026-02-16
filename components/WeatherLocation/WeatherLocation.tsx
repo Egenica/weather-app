@@ -104,19 +104,18 @@ function getClosestHourTimestamp(hours: DailyForecast['hours']): string | null {
   return closest ? closest.timestamp : null;
 }
 
-function sameHour(timestampA: string, timestampB: string): boolean {
-  const a = new Date(timestampA);
-  const b = new Date(timestampB);
+function isSameLocalHour(timestamp: string, referenceDate: Date): boolean {
+  const value = new Date(timestamp);
 
-  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) {
+  if (Number.isNaN(value.getTime())) {
     return false;
   }
 
   return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate() &&
-    a.getHours() === b.getHours()
+    value.getFullYear() === referenceDate.getFullYear() &&
+    value.getMonth() === referenceDate.getMonth() &&
+    value.getDate() === referenceDate.getDate() &&
+    value.getHours() === referenceDate.getHours()
   );
 }
 
@@ -195,8 +194,9 @@ export const WeatherLocation = ({ weatherData }: WeatherLocationProps) => {
         <CarouselContent>
           {weatherData.dailyPages.map((day) => {
             const tempRange = rangeForDay(day);
+            const now = new Date();
             const highlightedTimestamp = isToday(day.date)
-              ? day.hours.find((hour) => sameHour(hour.timestamp, weatherData.current.timestamp))?.timestamp ??
+              ? day.hours.find((hour) => isSameLocalHour(hour.timestamp, now))?.timestamp ??
                 getClosestHourTimestamp(day.hours)
               : null;
 
