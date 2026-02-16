@@ -199,6 +199,12 @@ function dayKeyFromTimestamp(timestamp: string): string {
   return timestamp.slice(0, 10);
 }
 
+function nextDayKey(day: string): string {
+  const parsed = new Date(`${day}T00:00:00Z`);
+  parsed.setUTCDate(parsed.getUTCDate() + 1);
+  return parsed.toISOString().slice(0, 10);
+}
+
 function mergeCurrentDayWithHourly(
   dailyPages: DailyForecast[],
   hourlySeries: Array<Record<string, unknown>>,
@@ -219,15 +225,36 @@ function mergeCurrentDayWithHourly(
       return day;
     }
 
+    const mergedByTimestamp = new Map<string, HourlyForecast>();
+
+    for (const item of day.hours) {
+      mergedByTimestamp.set(item.timestamp, item);
+    }
+
+    for (const item of hourlyCurrentDay) {
+      mergedByTimestamp.set(item.timestamp, item);
+    }
+
+    const nextDay = dailyPages.find((candidate) => candidate.date === nextDayKey(currentDay));
+    const midnightNextDay = nextDay?.hours.find((item) => {
+      const parsed = new Date(item.timestamp);
+      return !Number.isNaN(parsed.getTime()) && parsed.getUTCHours() === 0 && parsed.getUTCMinutes() === 0;
+    });
+    if (midnightNextDay) {
+      mergedByTimestamp.set(midnightNextDay.timestamp, midnightNextDay);
+    }
+
+    const mergedHours = Array.from(mergedByTimestamp.values()).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+
     return {
       ...day,
-      hours: hourlyCurrentDay,
+      hours: mergedHours,
     };
   });
 }
 
 function cacheKey(lat: number, lon: number): string {
-  return `weather:v2:${lat.toFixed(4)},${lon.toFixed(4)}`;
+  return `weather:v3:${lat.toFixed(4)},${lon.toFixed(4)}`;
 }
 
 export async function getCurrentHourlyForecast(lat: number, lon: number): Promise<SimplifiedWeather> {
