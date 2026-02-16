@@ -1,51 +1,80 @@
 'use client';
 
-import { WeatherLocationT, getWeatherLocations } from '@/components/server/weather.server';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
+export type SearchLocation = {
+  adminArea: string | null;
+  country: string;
+  lat: number;
+  lon: number;
+  name: string;
+};
+
 type WeatherSearchProps = {
-  setLocation: (location: WeatherLocationT) => void;
+  setLocation: (location: SearchLocation) => void;
 };
 
 export default function WeatherSearch({ setLocation, ...props }: WeatherSearchProps) {
   const isTabletOrMobile = useMediaQuery({ maxWidth: 1224 });
   const [search, setSearch] = useState('');
-  const [locations, setLocations] = useState<WeatherLocationT[] | null>(null);
-  const [filteredLocations, setFilteredLocations] = useState<WeatherLocationT[] | null>(null);
+  const [locations, setLocations] = useState<SearchLocation[]>([]);
   const [placeholder, setPlaceholder] = useState('Search locations...');
   const [, setShowScroll] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // get locations from local storage
-    const locations = localStorage.getItem('locations');
-
-    if (locations) {
-      setLocations(JSON.parse(locations));
-    } else {
-      getWeatherLocations().then((data) => {
-        // set locations to local storage
-        localStorage.setItem('locations', JSON.stringify(data));
-        setLocations(data);
+    fetch('/api/geocode')
+      .then((response) => response.json())
+      .then((data) => {
+        setLocations(Array.isArray(data.locations) ? data.locations : []);
+      })
+      .catch(() => {
+        setLocations([]);
       });
-    }
   }, []);
 
   useEffect(() => {
-    if (search.length >= 3) {
-      if (locations) {
-        setFilteredLocations(
-          locations.filter((location) => location.name.toLowerCase().includes(search.toLowerCase())),
-        );
-      }
-    } else {
-      setFilteredLocations(null);
+    const trimmed = search.trim();
+
+    if (!trimmed) {
+      return;
     }
-  }, [search, locations]);
+
+    if (trimmed.length < 2) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setLoading(true);
+      fetch(`/api/geocode?q=${encodeURIComponent(trimmed)}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setLocations(Array.isArray(data.locations) ? data.locations : []);
+        })
+        .catch(() => {
+          setLocations([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 250);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  const hasQuery = search.trim().length >= 2;
+  const visibleLocations = useMemo(() => {
+    if (hasQuery) {
+      return locations;
+    }
+
+    return locations.slice(0, 10);
+  }, [hasQuery, locations]);
 
   return (
     <div {...props} className="mt-4 text-center">
@@ -70,17 +99,24 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
           type="button"
           className="absolute right-4 top-1/2 -translate-y-1/2 transform rounded-full bg-slate-400"
           onClick={() => {
-            setFilteredLocations(null);
             setSearch('');
+            fetch('/api/geocode')
+              .then((response) => response.json())
+              .then((data) => {
+                setLocations(Array.isArray(data.locations) ? data.locations : []);
+              })
+              .catch(() => {
+                setLocations([]);
+              });
           }}
         >
           X
         </Button>
       </div>
-      {filteredLocations && (
+      {visibleLocations.length > 0 && (
         <ScrollArea
           className={
-            filteredLocations.length >= 6
+            visibleLocations.length >= 6
               ? 'mx-auto mt-2 h-96 w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur md:w-2/4'
               : 'mx-auto mt-2 h-auto w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur md:w-2/4'
           }
@@ -88,25 +124,27 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
         >
           <div className="p-4">
             <ul className="m-0">
-              {filteredLocations.map((location, i) => (
-                <li key={location.id}>
+              {visibleLocations.map((location, i) => (
+                <li key={`${location.name}-${location.lat}-${location.lon}`}>
                   <Button
                     variant={'link'}
                     className="block h-auto w-full text-xl font-light text-white hover:bg-slate-100 hover:text-black"
                     onClick={() => {
                       setLocation(location);
-                      localStorage.setItem('location', JSON.stringify(location && location));
+                      localStorage.setItem('location', JSON.stringify(location));
                     }}
-                    title={location?.name}
+                    title={location.name}
                   >
-                    {isTabletOrMobile && location?.name.length > 20
-                      ? location?.name.slice(0, 20) + '...'
-                      : location?.name}
+                    {isTabletOrMobile && location.name.length > 20 ? `${location.name.slice(0, 20)}...` : location.name}
+                    <span className="block text-xs opacity-70">
+                      {[location.adminArea, location.country].filter(Boolean).join(', ')}
+                    </span>
                   </Button>
-                  {i !== filteredLocations.length - 1 && <Separator className="my-3 opacity-20" />}
+                  {i !== visibleLocations.length - 1 && <Separator className="my-3 opacity-20" />}
                 </li>
               ))}
             </ul>
+            {loading && <p className="p-3 text-xs text-white opacity-70">Searching...</p>}
           </div>
         </ScrollArea>
       )}

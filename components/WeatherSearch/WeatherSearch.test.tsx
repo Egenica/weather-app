@@ -1,12 +1,15 @@
-import { WeatherLocation } from '@/components/server/weather.server';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import fetchMock from 'jest-fetch-mock';
 
-import { mockSearchData } from '../../mocks/mockSearchData';
 import WeatherSearch from './WeatherSearch';
 
 beforeEach(() => {
-  fetchMock.mockResponseOnce(JSON.stringify(mockSearchData as WeatherLocation[]));
+  fetchMock.resetMocks();
+  fetchMock.mockResponseOnce(
+    JSON.stringify({
+      locations: [{ adminArea: 'England', country: 'United Kingdom', lat: 53.8, lon: -1.5, name: 'Leeds' }],
+    }),
+  );
 });
 
 afterEach(() => {
@@ -22,20 +25,20 @@ describe('WeatherSearch', () => {
   });
 
   it('filters locations based on search input', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        locations: [{ adminArea: 'England', country: 'United Kingdom', lat: 60.4, lon: -1.3, name: 'Scatsta' }],
+      }),
+    );
+
     render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByTestId('search-input');
 
-    // Simulate user typing 'Location 1' into the search input
     fireEvent.change(inputElement, { target: { value: 'Scatsta' } });
 
-    fireEvent.focus(inputElement); // Simulate user focusing on the search input
-
-    // Wait for the useEffect hook to run and update the state
     await waitFor(
       () => {
         const scrollAreaElement = screen.getByTestId('scroll-area');
-
-        //console.log(scrollAreaElement.innerHTML);
 
         expect(scrollAreaElement).toBeInTheDocument();
 
@@ -47,43 +50,43 @@ describe('WeatherSearch', () => {
   });
 
   it('counts the number of items returned', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        locations: [
+          { adminArea: 'England', country: 'United Kingdom', lat: 53.8, lon: -1.5, name: 'Leeds' },
+          { adminArea: 'England', country: 'United Kingdom', lat: 53.7, lon: -1.4, name: 'Leeds Bradford' },
+        ],
+      }),
+    );
+
     render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByTestId('search-input');
 
-    // Simulate user typing 'Location 1' into the search input
-    fireEvent.change(inputElement, { target: { value: 'Sca' } });
+    fireEvent.change(inputElement, { target: { value: 'Lee' } });
 
-    fireEvent.focus(inputElement); // Simulate user focusing on the search input
-
-    // Wait for the useEffect hook to run and update the state
     await waitFor(
       () => {
         const scrollAreaElement = screen.getByTestId('scroll-area');
 
-        //console.log(scrollAreaElement.innerHTML);
-
         expect(scrollAreaElement).toBeInTheDocument();
 
-        // count the number of items returned
         const items = scrollAreaElement.querySelectorAll('li');
 
-        expect(items.length).toEqual(22);
+        expect(items.length).toEqual(2);
       },
       { timeout: 5000 },
     );
   });
 
-  it('does not display locations when search input is less than 3 characters', async () => {
+  it('keeps fallback locations when query is shorter than 2 characters', async () => {
     render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByPlaceholderText('Search locations...');
 
-    // Simulate user typing 'Sc' into the search input
-    fireEvent.change(inputElement, { target: { value: 'Sc' } });
+    fireEvent.change(inputElement, { target: { value: 'S' } });
 
-    // Wait for the useEffect hook to run and update the state
     await waitFor(() => {
-      const filteredLocation = screen.queryByText('Scatsta');
-      expect(filteredLocation).not.toBeInTheDocument();
+      const filteredLocation = screen.getByText('Leeds');
+      expect(filteredLocation).toBeInTheDocument();
     });
   });
 });

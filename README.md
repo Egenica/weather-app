@@ -1,51 +1,91 @@
-# Weather App - Using Met Office API (W.I.P)
+# Weather App - Met Office DataHub
 
-A fun little weather app that uses all the modern frontend / backend frameworks with NextJs / Tailwind / Typescript.
+Location-first weather app rebuilt for Met Office Weather DataHub.
 
-### API Link
+Users search for a UK location, pick a result, and see current weather derived from the first timestep of the DataHub Global Spot hourly forecast.
 
-- https://www.metoffice.gov.uk/services/data/datapoint
+## Stack
 
-### Install Deps
+- Next.js + TypeScript + Tailwind
+- Native `fetch` (Node 20)
+- Backend route handlers for geocoding and weather
+- Shared in-memory TTL cache (10 minutes)
 
-`npm i`
+## Environment Variables
 
-### Run Dev
+Copy `.env.example` to `.env.local` and add:
 
-`npm run dev`
+```bash
+METOFFICE_API_KEY=your-datahub-api-key
+```
 
-### Run Production
+## Run Locally
 
-`npm run build`
+```bash
+npm i
+npm run dev
+```
 
-`npm run start`
+Production build/start:
 
-### Run Test
+```bash
+npm run build
+npm run start
+```
 
-`npm run test`
+## API Endpoints
 
-## Features
+### `GET /api/geocode?q=<query>`
 
-- Location search.
-- PWA Application, install as an 'App' to iPhone and android (https://www.youtube.com/watch?v=AwfKUpq5seE).
-- 5 day forcast by the Met Office data API.
-- Uses NextJs / Typescript / Tailwind.
-- Backend server API for data.
-- Background changes depending on time of day and weather conditions.
-- Location is saved in local storage.
+- Backend Open-Meteo geocoding (UK-only)
+- Returns clickable location suggestions
+- Empty query returns popular UK locations fallback list
 
-## ToDo
+Response shape:
 
-- Tests need updating/adding to some sections.
-- Currently, the 'Now at a glance' feature uses the first row of data, so it's not time-accurate unless it's in the morning. This was added as a "nice to have" feature but needs to be made time-accurate.
-- The 'Now at a glance' feature should also change when the day is changed.
-- It uses two API calls but might need to change to one, as it's potentially overly complicated by merging the two to display the time.
-- More backgrounds need to be added for the counties. Currently, it displays various pictures of Yorkshire/Lancashire based on the quick view weather.
-- Some wind direction icons might not be showing.
-- Currently, the background can get stuck between viewing sessions; refreshing again fixes it, but this needs to be looked into (there's some kind of caching going on—it might be a local storage issue and needs investigation).
-- There might be weather conditions where there are no icons, but I haven't seen that yet.
-- Code test coverage needs to be added.
-- Maybe the background should change based on the current day fade out old in new but could be a bit clunky - Might need to test locally.
-- Background isn't updated if location is changed until page has manually been refreshed.
-- I think the backgrounds should match the location, currently it has yorkshire based dynamic backgrounds so other locations will need a set of backgrounds created and the code updating to check for a location match. Microsoft AI image gen -> https://copilot.microsoft.com/images/create
-- All weather conditions aren't currently covered with background images so can display an incorrect image aka a default which isn't ideal
+```json
+{
+  "locations": [
+    {
+      "name": "Leeds",
+      "adminArea": "England",
+      "country": "United Kingdom",
+      "lat": 53.8008,
+      "lon": -1.5491
+    }
+  ]
+}
+```
+
+### `GET /weather?lat=<number>&lon=<number>`
+
+- Backend Met Office DataHub Global Spot hourly
+- Uses first hourly timestep as "current weather"
+- Always returns `timestamp` so UI can label data as `Forecast (hourly)`
+
+Response shape:
+
+```json
+{
+  "temperature": 5,
+  "feelsLike": 3,
+  "windSpeed": 12,
+  "humidity": 88,
+  "weatherCode": 7,
+  "timestamp": "2026-02-16T11:00:00Z"
+}
+```
+
+## Error Handling
+
+- `400`: invalid input
+- `502`: upstream provider failure
+- `500`: internal/config error (for example missing `METOFFICE_API_KEY`)
+
+## Caching
+
+- Shared in-memory cache for both geocoding and weather
+- TTL: 10 minutes
+- Cache keys:
+  - geocode: normalized query
+  - weather: normalized lat/lon

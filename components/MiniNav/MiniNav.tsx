@@ -1,11 +1,14 @@
 import { useMediaQuery } from 'react-responsive';
 
-import { WeatherLocationT } from '../server/weather.server';
 import { Button } from '../ui/button';
 
+type MiniNavLocation = {
+  name: string;
+};
+
 type MiniNavProps = {
-  location: WeatherLocationT | null;
-  setLocation: (location: WeatherLocationT | null) => void;
+  location: MiniNavLocation | null;
+  setLocation: () => void;
 };
 
 export const MiniNav = ({ location, setLocation, ...props }: MiniNavProps) => {
@@ -18,7 +21,7 @@ export const MiniNav = ({ location, setLocation, ...props }: MiniNavProps) => {
           variant={'link'}
           typeof="button"
           className="text-sm font-normal text-white opacity-50 hover:opacity-100"
-          onClick={() => setLocation(null)}
+          onClick={setLocation}
         >
           Change Location
         </Button>

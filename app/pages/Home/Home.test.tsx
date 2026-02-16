@@ -13,6 +13,10 @@ afterEach(() => {
 });
 
 describe('Home', () => {
+  beforeEach(() => {
+    fetchMock.mockResponse(JSON.stringify({ locations: [] }));
+  });
+
   it('renders the MiniNav component', () => {
     render(<Home />);
     const miniNavElement = screen.getByTestId('mini-nav');
@@ -20,7 +24,6 @@ describe('Home', () => {
   });
 
   it('renders the WeatherSearch component', () => {
-    fetchMock.mockResponseOnce(JSON.stringify({ data: '12345' }));
     render(<Home />);
     const weatherSearchElement = screen.getByTestId('weather-search');
     expect(weatherSearchElement).toBeInTheDocument();
