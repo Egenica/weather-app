@@ -198,7 +198,7 @@ export const WeatherLocation = ({ weatherData }: WeatherLocationProps) => {
                   <TableHeader className="bg-white bg-opacity-10">
                     <TableRow className="hover:bg-transparent">
                       <TableHead className="py-2 text-white">Date & Time</TableHead>
-                      <TableHead className="py-2 text-white">Weather Type</TableHead>
+                      <TableHead className="py-2 text-center text-white">Weather Type</TableHead>
                       <TableHead className="py-2 text-white">Temp</TableHead>
                       <TableHead className="py-2 text-white">Feels</TableHead>
                       <TableHead className="py-2 text-white">Humidity</TableHead>
@@ -240,7 +240,7 @@ export const WeatherLocation = ({ weatherData }: WeatherLocationProps) => {
                               ) : (
                                 <span className="text-white">--</span>
                               )}
-                              <span className="text-xs">{visual.label}</span>
+                              <span className="block w-full text-center text-xs">{visual.label}</span>
                             </div>
                           </TableCell>
                           <TableCell className="text-white">{hour.temperature ?? '--'}C</TableCell>
