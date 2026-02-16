@@ -20,11 +20,26 @@ describe('weather-datahub', () => {
               timeSeries: [
                 {
                   feelsLikeTemperature: 3,
+                  precipitationProbabilityInPercent: 20,
                   screenRelativeHumidity: 88,
                   screenTemperature: 5,
                   significantWeatherCode: 7,
                   time: '2026-02-16T11:00:00Z',
+                  windDirectionFrom10m: 'NW',
+                  windGustSpeed10m: 22,
                   windSpeed10m: 12,
+                },
+                {
+                  feelsLikeTemperature: 5,
+                  screenTemperature: 8,
+                  significantWeatherCode: 3,
+                  time: '2026-02-16T13:00:00Z',
+                },
+                {
+                  feelsLikeTemperature: 1,
+                  screenTemperature: 2,
+                  significantWeatherCode: 5,
+                  time: '2026-02-17T12:00:00Z',
                 },
               ],
             },
@@ -35,12 +50,66 @@ describe('weather-datahub', () => {
 
     const result = await getCurrentHourlyForecast(53.8, -1.5);
     expect(result).toEqual({
-      feelsLike: 3,
-      humidity: 88,
-      temperature: 5,
-      timestamp: '2026-02-16T11:00:00Z',
-      weatherCode: 7,
-      windSpeed: 12,
+      current: {
+        feelsLike: 3,
+        humidity: 88,
+        precipitationChance: 20,
+        temperature: 5,
+        timestamp: '2026-02-16T11:00:00Z',
+        visibility: null,
+        weatherCode: 7,
+        windDirection: 'NW',
+        windGust: 22,
+        windSpeed: 12,
+      },
+      dailyPages: [
+        {
+          date: '2026-02-16',
+          hours: [
+            {
+              feelsLike: 3,
+              humidity: 88,
+              precipitationChance: 20,
+              temperature: 5,
+              timestamp: '2026-02-16T11:00:00Z',
+              visibility: null,
+              weatherCode: 7,
+              windDirection: 'NW',
+              windGust: 22,
+              windSpeed: 12,
+            },
+            {
+              feelsLike: 5,
+              humidity: null,
+              precipitationChance: null,
+              temperature: 8,
+              timestamp: '2026-02-16T13:00:00Z',
+              visibility: null,
+              weatherCode: 3,
+              windDirection: null,
+              windGust: null,
+              windSpeed: null,
+            },
+          ],
+        },
+        {
+          date: '2026-02-17',
+          hours: [
+            {
+              feelsLike: 1,
+              humidity: null,
+              precipitationChance: null,
+              temperature: 2,
+              timestamp: '2026-02-17T12:00:00Z',
+              visibility: null,
+              weatherCode: 5,
+              windDirection: null,
+              windGust: null,
+              windSpeed: null,
+            },
+          ],
+        },
+      ],
     });
   });
 

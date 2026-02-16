@@ -5,11 +5,6 @@ import WeatherSearch from './WeatherSearch';
 
 beforeEach(() => {
   fetchMock.resetMocks();
-  fetchMock.mockResponseOnce(
-    JSON.stringify({
-      locations: [{ adminArea: 'England', country: 'United Kingdom', lat: 53.8, lon: -1.5, name: 'Leeds' }],
-    }),
-  );
 });
 
 afterEach(() => {
@@ -78,15 +73,28 @@ describe('WeatherSearch', () => {
     );
   });
 
-  it('keeps fallback locations when query is shorter than 2 characters', async () => {
+  it('shows no results when query is shorter than 2 characters', async () => {
     render(<WeatherSearch setLocation={jest.fn()} />);
     const inputElement = screen.getByPlaceholderText('Search locations...');
 
     fireEvent.change(inputElement, { target: { value: 'S' } });
 
     await waitFor(() => {
-      const filteredLocation = screen.getByText('Leeds');
-      expect(filteredLocation).toBeInTheDocument();
+      const scrollArea = screen.queryByTestId('scroll-area');
+      expect(scrollArea).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows unknown location when search has no match', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify({ locations: [] }));
+
+    render(<WeatherSearch setLocation={jest.fn()} />);
+    const inputElement = screen.getByTestId('search-input');
+
+    fireEvent.change(inputElement, { target: { value: 'zzzzzz' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('Unknown location')).toBeInTheDocument();
     });
   });
 });

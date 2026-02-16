@@ -1,16 +1,12 @@
-import { GeocodeUpstreamError, getPopularUkLocations, searchUkLocations } from '@/lib/server/geocode';
+import { GeocodeUpstreamError, searchUkLocations } from '@/lib/server/geocode';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = (searchParams.get('q') ?? '').trim();
 
-  if (!query) {
-    return NextResponse.json({ locations: getPopularUkLocations() });
-  }
-
-  if (query.length < 2) {
-    return NextResponse.json({ error: 'Query must be at least 2 characters long' }, { status: 400 });
+  if (!query || query.length < 2) {
+    return NextResponse.json({ locations: [] });
   }
 
   try {

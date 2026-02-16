@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
 export type SearchLocation = {
@@ -26,38 +26,38 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
   const [placeholder, setPlaceholder] = useState('Search locations...');
   const [, setShowScroll] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/geocode')
-      .then((response) => response.json())
-      .then((data) => {
-        setLocations(Array.isArray(data.locations) ? data.locations : []);
-      })
-      .catch(() => {
-        setLocations([]);
-      });
-  }, []);
+  const [unknownLocation, setUnknownLocation] = useState(false);
 
   useEffect(() => {
     const trimmed = search.trim();
 
     if (!trimmed) {
+      setLocations([]);
+      setLoading(false);
+      setUnknownLocation(false);
       return;
     }
 
     if (trimmed.length < 2) {
+      setLocations([]);
+      setLoading(false);
+      setUnknownLocation(false);
       return;
     }
 
     const timeout = setTimeout(() => {
       setLoading(true);
+      setUnknownLocation(false);
       fetch(`/api/geocode?q=${encodeURIComponent(trimmed)}`)
         .then((response) => response.json())
         .then((data) => {
-          setLocations(Array.isArray(data.locations) ? data.locations : []);
+          const nextLocations = Array.isArray(data.locations) ? data.locations : [];
+          setLocations(nextLocations);
+          setUnknownLocation(nextLocations.length === 0);
         })
         .catch(() => {
           setLocations([]);
+          setUnknownLocation(false);
         })
         .finally(() => {
           setLoading(false);
@@ -67,14 +67,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
     return () => clearTimeout(timeout);
   }, [search]);
 
-  const hasQuery = search.trim().length >= 2;
-  const visibleLocations = useMemo(() => {
-    if (hasQuery) {
-      return locations;
-    }
-
-    return locations.slice(0, 10);
-  }, [hasQuery, locations]);
+  const showLocations = search.trim().length >= 2 && locations.length > 0;
 
   return (
     <div {...props} className="mt-4 text-center">
@@ -100,23 +93,17 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
           className="absolute right-4 top-1/2 -translate-y-1/2 transform rounded-full bg-slate-400"
           onClick={() => {
             setSearch('');
-            fetch('/api/geocode')
-              .then((response) => response.json())
-              .then((data) => {
-                setLocations(Array.isArray(data.locations) ? data.locations : []);
-              })
-              .catch(() => {
-                setLocations([]);
-              });
+            setLocations([]);
+            setUnknownLocation(false);
           }}
         >
           X
         </Button>
       </div>
-      {visibleLocations.length > 0 && (
+      {showLocations && (
         <ScrollArea
           className={
-            visibleLocations.length >= 6
+            locations.length >= 6
               ? 'mx-auto mt-2 h-96 w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur md:w-2/4'
               : 'mx-auto mt-2 h-auto w-auto rounded-md border border-white/20 bg-white bg-opacity-10 backdrop-blur md:w-2/4'
           }
@@ -124,7 +111,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
         >
           <div className="p-4">
             <ul className="m-0">
-              {visibleLocations.map((location, i) => (
+              {locations.map((location, i) => (
                 <li key={`${location.name}-${location.lat}-${location.lon}`}>
                   <Button
                     variant={'link'}
@@ -140,7 +127,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
                       {[location.adminArea, location.country].filter(Boolean).join(', ')}
                     </span>
                   </Button>
-                  {i !== visibleLocations.length - 1 && <Separator className="my-3 opacity-20" />}
+                  {i !== locations.length - 1 && <Separator className="my-3 opacity-20" />}
                 </li>
               ))}
             </ul>
@@ -148,6 +135,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
           </div>
         </ScrollArea>
       )}
+      {!loading && unknownLocation && <p className="mt-3 text-sm text-red-200">Unknown location</p>}
     </div>
   );
 }
