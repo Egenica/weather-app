@@ -48,6 +48,8 @@ export default function Home() {
       })
       .then((data) => {
         setWeather(data);
+        localStorage.setItem('weatherNow', JSON.stringify({ W: data.current.weatherCode }));
+        window.dispatchEvent(new Event('weather-background-update'));
       })
       .catch((error) => {
         setWeather(null);
@@ -65,6 +67,8 @@ export default function Home() {
         location={location}
         setLocation={() => {
           localStorage.removeItem('location');
+          localStorage.removeItem('weatherNow');
+          window.dispatchEvent(new Event('weather-background-update'));
           setLocation(null);
           setWeather(null);
           setWeatherError(null);
