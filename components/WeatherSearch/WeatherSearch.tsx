@@ -114,9 +114,9 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
             <ul className="m-0">
               {locations.map((location, i) => (
                 <li key={`${location.name}-${location.lat}-${location.lon}`}>
-                  <Button
-                    variant={'link'}
-                    className="block h-auto w-full text-xl font-light text-white hover:bg-slate-100 hover:text-black"
+                  <button
+                    type="button"
+                    className="group block h-auto w-full p-2 text-left text-xl font-light text-white hover:bg-slate-100 hover:text-black"
                     onClick={() => {
                       setLocation(location);
                       localStorage.setItem('location', JSON.stringify(location));
@@ -124,15 +124,15 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
                     title={location.name}
                   >
                     {isTabletOrMobile && location.name.length > 20 ? `${location.name.slice(0, 20)}...` : location.name}
-                    <span className="block text-xs opacity-70">
+                    <span className="block text-xs opacity-70 group-hover:opacity-90">
                       {[location.adminArea, location.country].filter(Boolean).join(', ')}
                     </span>
                     {location.isRegion && (
-                      <span className="mt-1 inline-block rounded bg-teal-200 px-2 py-0.5 text-[10px] uppercase tracking-wide text-black">
+                      <span className="mt-1 block text-[11px] uppercase tracking-[0.12em] text-teal-100/90 group-hover:text-slate-700">
                         Regional estimate
                       </span>
                     )}
-                  </Button>
+                  </button>
                   {i !== locations.length - 1 && <Separator className="my-3 opacity-20" />}
                 </li>
               ))}
