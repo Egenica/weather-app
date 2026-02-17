@@ -20,6 +20,10 @@
 .DS_Store
 *.pem
 /dev-screenshots/
+/public/backgrounds/**/*.png
+/public/backgrounds/**/*.jpg
+/public/backgrounds/**/*.jpeg
+/public/backgrounds/**/*.webp
 
 # debug
 npm-debug.log*

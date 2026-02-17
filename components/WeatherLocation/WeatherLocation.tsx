@@ -94,6 +94,20 @@ function formatHour(timestamp: string): string {
   });
 }
 
+function TimeWithPeriod({ value }: { value: string }): React.JSX.Element {
+  const match = value.match(/^(.*?)(\s?(am|pm))$/i);
+  if (!match) {
+    return <span>{value}</span>;
+  }
+
+  return (
+    <span>
+      {match[1]}
+      <span className="ml-0.5 align-baseline text-[11px] uppercase opacity-80">{match[3]}</span>
+    </span>
+  );
+}
+
 function isCurrentHour(timestamp: string): boolean {
   const rowDate = new Date(timestamp);
   const now = new Date();
@@ -303,7 +317,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
                   <span className="mx-3 inline-block">
                     {displayDate(day.date)}
                     <span className="ml-2 text-sm opacity-70">
-                      (Min {tempRange.min ?? '--'}C / Max {tempRange.max ?? '--'}C)
+                      (Min {formatRoundedDegrees(tempRange.min)} / Max {formatRoundedDegrees(tempRange.max)})
                     </span>
                   </span>
                   <CarouselNext className="relative ml-auto" />
@@ -340,7 +354,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
                           <TableCell className="whitespace-nowrap text-white">
                             <span className="inline-flex items-center gap-2">
                               {isNow && <span className="h-2 w-2 rounded-full bg-teal-200" aria-hidden="true" />}
-                              <span>{formatHour(hour.timestamp)}</span>
+                              <TimeWithPeriod value={formatHour(hour.timestamp)} />
                               {isNow && (
                                 <span className="rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-black">
                                   Now

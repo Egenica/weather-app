@@ -1,8 +1,9 @@
 import { TtlCache } from '@/lib/server/cache';
+import { access } from 'node:fs/promises';
+import path from 'node:path';
 
 const backgroundCache = new TtlCache(24 * 60 * 60 * 1000);
-const TARGET_IMAGE_WIDTH = 2560;
-const TARGET_IMAGE_HEIGHT = 1440;
+const backgroundAssetBaseUrl = process.env.BACKGROUND_ASSET_BASE_URL?.trim().replace(/\/+$/, '') ?? '';
 
 export class BackgroundImageUpstreamError extends Error {
   constructor(message: string) {
@@ -11,7 +12,7 @@ export class BackgroundImageUpstreamError extends Error {
   }
 }
 
-type BackgroundSource = 'pollinations' | 'unsplash' | 'cache';
+type BackgroundSource = 'local' | 'cache';
 
 type GenerateBackgroundInput = {
   adminArea?: string | null;
@@ -25,75 +26,42 @@ type GenerateBackgroundInput = {
   windSpeed?: number | null;
 };
 
-const WEATHER_LABELS: Record<number, string> = {
-  0: 'clear night',
-  1: 'sunny day',
-  2: 'partly cloudy night',
-  3: 'partly cloudy day',
-  5: 'misty',
-  6: 'foggy',
+const WEATHER_BUCKETS: Record<number, string> = {
+  0: 'clear',
+  1: 'clear',
+  2: 'partly-cloudy',
+  3: 'partly-cloudy',
+  5: 'mist-fog',
+  6: 'mist-fog',
   7: 'cloudy',
   8: 'overcast',
-  9: 'light rain shower',
-  10: 'light rain shower',
+  9: 'drizzle',
+  10: 'drizzle',
   11: 'drizzle',
-  12: 'light rain',
-  13: 'heavy rain shower',
-  14: 'heavy rain shower',
-  15: 'heavy rain',
-  16: 'sleet shower',
-  17: 'sleet shower',
+  12: 'rain',
+  13: 'heavy-rain',
+  14: 'heavy-rain',
+  15: 'heavy-rain',
+  16: 'sleet',
+  17: 'sleet',
   18: 'sleet',
-  19: 'hail shower',
-  20: 'hail shower',
+  19: 'hail',
+  20: 'hail',
   21: 'hail',
-  22: 'light snow shower',
-  23: 'light snow shower',
-  24: 'light snow',
-  25: 'heavy snow shower',
-  26: 'heavy snow shower',
-  27: 'heavy snow',
-  28: 'thunder shower',
-  29: 'thunder shower',
+  22: 'light-snow',
+  23: 'light-snow',
+  24: 'light-snow',
+  25: 'heavy-snow',
+  26: 'heavy-snow',
+  27: 'heavy-snow',
+  28: 'thunderstorm',
+  29: 'thunderstorm',
   30: 'thunderstorm',
 };
 
-const WEATHER_VISUAL_RULES: Record<number, string> = {
-  0: 'clear night sky with visible stars or moonlight, dark blue tones',
-  1: 'strong sunlight and clear visibility',
-  7: 'cloud-dominant sky and subdued daylight',
-  8: 'fully overcast sky with heavy grey cloud cover',
-  12: 'steady rain with clearly wet terrain and puddles',
-  15: 'heavy rain with stormy atmosphere',
-  22: 'light snow shower with visible flakes',
-  24: 'light snowfall settling on landscape',
-  27: 'heavy snow and severe winter conditions',
-  30: 'thunderstorm clouds with dramatic storm light',
-};
-
-const LOCATION_STYLE_HINTS: Array<{ match: RegExp; hint: string }> = [
-  {
-    match: /blackpool|lancashire|merseyside|liverpool/i,
-    hint: 'windswept coastal plain, sea air mood, northern shoreline character',
-  },
-  {
-    match: /cardiff|wales|swansea|newport/i,
-    hint: 'rolling welsh hills, dramatic valleys, coastal-weather atmosphere',
-  },
-  { match: /aberdeen|inverness|scotland/i, hint: 'highland-inspired terrain, rugged landforms, cool northern light' },
-  { match: /yorkshire|leeds|sheffield/i, hint: 'moorland textures, dry-stone wall patterns, broad northern skies' },
-  { match: /london|kent|essex/i, hint: 'southern english countryside palette, softer lowland horizon' },
-];
-
-function locationStyleHint(input: GenerateBackgroundInput): string {
-  const target = `${input.locationName} ${input.adminArea ?? ''} ${input.country}`;
-  const matched = LOCATION_STYLE_HINTS.find((item) => item.match.test(target));
-  return matched ? matched.hint : 'regional UK landscape character matching this location';
-}
-
 function cacheKey(input: GenerateBackgroundInput): string {
   return [
-    'bg:v7',
+    'bg:v10',
     input.locationName.trim().toLowerCase(),
     (input.adminArea ?? '').trim().toLowerCase(),
     input.country.trim().toLowerCase(),
@@ -102,88 +70,142 @@ function cacheKey(input: GenerateBackgroundInput): string {
   ].join(':');
 }
 
-function buildPrompt(input: GenerateBackgroundInput): string {
-  const weatherLabel =
-    typeof input.weatherCode === 'number' ? WEATHER_LABELS[input.weatherCode] ?? 'weather' : 'weather';
-  const weatherRule =
-    typeof input.weatherCode === 'number'
-      ? WEATHER_VISUAL_RULES[input.weatherCode] ?? 'weather conditions clearly visible in the scene'
-      : 'weather conditions clearly visible in the scene';
-
-  const area = input.adminArea ? `${input.adminArea}, ${input.country}` : input.country;
-  const conditionBits = [
-    typeof input.temperature === 'number' ? `temperature around ${Math.round(input.temperature)}C` : null,
-    typeof input.feelsLike === 'number' ? `feels like ${Math.round(input.feelsLike)}C` : null,
-    typeof input.humidity === 'number' ? `humidity about ${Math.round(input.humidity)}%` : null,
-    typeof input.windSpeed === 'number' ? `wind around ${Math.round(input.windSpeed)} mph` : null,
-  ].filter(Boolean);
-
-  return [
-    `Beautiful atmospheric landscape inspired by ${input.locationName}, ${area}.`,
-    `Location style cue: ${locationStyleHint(input)}.`,
-    `Current conditions: ${weatherLabel}.`,
-    `The weather must be visually obvious: ${weatherRule}.`,
-    conditionBits.length > 0 ? `Condition cues: ${conditionBits.join(', ')}.` : null,
-    input.variantKey ? `Scene variation key: ${input.variantKey}. Use a distinct composition.` : null,
-    'Painterly-cinematic style, rich color grading, layered clouds, dramatic but natural lighting.',
-    'No people, no text, no logos, no signage, no watermark.',
-  ]
-    .filter(Boolean)
-    .join(' ');
-}
-
-function toDataUrl(contentType: string, imageBytes: ArrayBuffer): string {
-  const base64 = Buffer.from(imageBytes).toString('base64');
-  return `data:${contentType};base64,${base64}`;
-}
-
-async function fetchImageAsDataUrl(imageUrl: string): Promise<string> {
-  const response = await fetch(imageUrl, {
-    headers: {
-      Accept: 'image/*',
-      'User-Agent': 'weather-app/1.0',
-    },
-  });
-
-  if (!response.ok) {
-    throw new BackgroundImageUpstreamError(`Image fetch failed (${response.status})`);
+function withAssetBase(pathname: string): string {
+  if (!backgroundAssetBaseUrl) {
+    return pathname;
   }
 
-  const contentType = response.headers.get('content-type') ?? 'image/jpeg';
-  if (!contentType.startsWith('image/')) {
-    throw new BackgroundImageUpstreamError('Image fetch did not return an image');
+  return `${backgroundAssetBaseUrl}${pathname}`;
+}
+
+function weatherBucket(weatherCode: number | null): string {
+  if (typeof weatherCode !== 'number') {
+    return 'cloudy';
   }
 
-  return toDataUrl(contentType, await response.arrayBuffer());
+  return WEATHER_BUCKETS[weatherCode] ?? 'cloudy';
 }
 
-function stableSeed(input: GenerateBackgroundInput): number {
-  const source = `${input.locationName}:${input.adminArea ?? ''}:${input.country}:${input.weatherCode ?? 'unknown'}:${input.variantKey ?? ''}`;
-  return Array.from(source).reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 2147483647, 17);
+function bucketFallbacks(bucket: string): string[] {
+  const fallbackMap: Record<string, string[]> = {
+    'partly-cloudy': ['cloudy', 'overcast', 'clear'],
+    overcast: ['cloudy', 'partly-cloudy'],
+    cloudy: ['overcast', 'partly-cloudy'],
+    drizzle: ['rain', 'cloudy'],
+    rain: ['heavy-rain', 'drizzle', 'cloudy'],
+    'heavy-rain': ['rain', 'overcast'],
+    'mist-fog': ['cloudy', 'overcast'],
+    sleet: ['light-snow', 'rain', 'cloudy'],
+    hail: ['heavy-rain', 'thunderstorm', 'cloudy'],
+    'light-snow': ['heavy-snow', 'sleet', 'cloudy'],
+    'heavy-snow': ['light-snow', 'sleet', 'cloudy'],
+    thunderstorm: ['heavy-rain', 'rain', 'overcast'],
+    clear: ['partly-cloudy', 'cloudy'],
+  };
+
+  return [bucket, ...(fallbackMap[bucket] ?? [])];
 }
 
-async function requestPollinationsImage(prompt: string, seed: number): Promise<string> {
-  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?model=flux&width=${TARGET_IMAGE_WIDTH}&height=${TARGET_IMAGE_HEIGHT}&seed=${seed}&nologo=true&private=true&enhance=true`;
+function dayPart(weatherCode: number | null): 'day' | 'night' {
+  if (weatherCode === 0 || weatherCode === 2) {
+    return 'night';
+  }
 
+  return 'day';
+}
+
+function regionSlug(input: GenerateBackgroundInput): string {
+  const target = `${input.locationName} ${input.adminArea ?? ''} ${input.country}`.toLowerCase();
+
+  if (/scotland|aberdeen|inverness|fort william|isle of skye/.test(target)) {
+    return 'scotland';
+  }
+  if (/wales|cardiff|swansea|newport|bangor/.test(target)) {
+    return 'wales';
+  }
+  if (/northern ireland|belfast|derry|armagh/.test(target)) {
+    return 'northern-ireland';
+  }
+  if (/lancashire|blackpool|preston|liverpool|manchester|north west|cumbria/.test(target)) {
+    return 'north-west-england';
+  }
+  if (/newcastle|sunderland|durham|north east/.test(target)) {
+    return 'north-east-england';
+  }
+  if (/yorkshire|leeds|sheffield|hull|york/.test(target)) {
+    return 'yorkshire-humber';
+  }
+  if (/birmingham|coventry|wolverhampton|west midlands/.test(target)) {
+    return 'west-midlands';
+  }
+  if (/nottingham|derby|leicester|east midlands/.test(target)) {
+    return 'east-midlands';
+  }
+  if (/norfolk|suffolk|cambridge|east of england/.test(target)) {
+    return 'east-england';
+  }
+  if (/london|greater london/.test(target)) {
+    return 'greater-london';
+  }
+  if (/kent|surrey|sussex|hampshire|south east/.test(target)) {
+    return 'south-east-england';
+  }
+  if (/cornwall|devon|somerset|bristol|south west/.test(target)) {
+    return 'south-west-england';
+  }
+
+  return 'uk';
+}
+
+async function fileExists(absolutePath: string): Promise<boolean> {
   try {
-    return await fetchImageAsDataUrl(imageUrl);
-  } catch (error) {
-    throw new BackgroundImageUpstreamError(
-      `Pollinations image generation failed${error instanceof Error ? `: ${error.message}` : ''}`,
+    await access(absolutePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveLocalBackgroundImage(input: GenerateBackgroundInput): Promise<string | null> {
+  const region = regionSlug(input);
+  const bucket = weatherBucket(input.weatherCode);
+  const time = dayPart(input.weatherCode);
+  const buckets = bucketFallbacks(bucket);
+
+  const candidates: string[] = [];
+
+  for (const candidateBucket of buckets) {
+    candidates.push(
+      `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.jpg`,
+      `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.png`,
+      `/backgrounds/uk/${region}/${candidateBucket}/v1.jpg`,
+      `/backgrounds/uk/${region}/${candidateBucket}/v1.webp`,
+      `/backgrounds/uk/${region}/${candidateBucket}/v1.png`,
+      `/backgrounds/${region}/${candidateBucket}/${time}/v1.jpg`,
+      `/backgrounds/${region}/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/${region}/${candidateBucket}/${time}/v1.png`,
+      `/backgrounds/${region}/${candidateBucket}/v1.jpg`,
+      `/backgrounds/${region}/${candidateBucket}/v1.webp`,
+      `/backgrounds/${region}/${candidateBucket}/v1.png`,
+      `/backgrounds/uk/${candidateBucket}/${time}/v1.jpg`,
+      `/backgrounds/uk/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/uk/${candidateBucket}/${time}/v1.png`,
     );
   }
-}
 
-async function requestUnsplashSourceImage(input: GenerateBackgroundInput): Promise<string> {
-  const weatherLabel =
-    typeof input.weatherCode === 'number' ? WEATHER_LABELS[input.weatherCode] ?? 'weather' : 'weather';
-  const tags = [input.locationName, input.adminArea ?? '', weatherLabel, 'landscape', 'weather']
-    .filter(Boolean)
-    .map((value) => value.replace(/\s+/g, '-'))
-    .join(',');
+  if (backgroundAssetBaseUrl) {
+    return withAssetBase(candidates[0]);
+  }
 
-  const url = `https://source.unsplash.com/${TARGET_IMAGE_WIDTH}x${TARGET_IMAGE_HEIGHT}/?${encodeURIComponent(tags)}&sig=${stableSeed(input)}`;
-  return fetchImageAsDataUrl(url);
+  for (const candidate of candidates) {
+    const absolute = path.join(process.cwd(), 'public', candidate.replace(/^\//, ''));
+    if (await fileExists(absolute)) {
+      return withAssetBase(candidate);
+    }
+  }
+
+  return null;
 }
 
 export async function generateBackgroundImage(
@@ -195,30 +217,13 @@ export async function generateBackgroundImage(
     return { imageUrl: cached, source: 'cache' };
   }
 
-  const prompt = buildPrompt(input);
-  const seed = stableSeed(input);
-
-  let imageDataUrl: string;
-  let source: BackgroundSource;
-  let pollinationsError = '';
-  let unsplashError = '';
-
-  try {
-    imageDataUrl = await requestPollinationsImage(prompt, seed);
-    source = 'pollinations';
-  } catch (error) {
-    pollinationsError = error instanceof Error ? error.message : 'unknown pollinations error';
-    try {
-      imageDataUrl = await requestUnsplashSourceImage(input);
-      source = 'unsplash';
-    } catch (innerError) {
-      unsplashError = innerError instanceof Error ? innerError.message : 'unknown unsplash error';
-      throw new BackgroundImageUpstreamError(
-        `All background providers failed. Pollinations: ${pollinationsError}. Unsplash: ${unsplashError}.`,
-      );
-    }
+  const localImagePath = await resolveLocalBackgroundImage(input);
+  if (localImagePath) {
+    backgroundCache.set(key, localImagePath);
+    return { imageUrl: localImagePath, source: 'local' };
   }
 
-  backgroundCache.set(key, imageDataUrl);
-  return { imageUrl: imageDataUrl, source };
+  throw new BackgroundImageUpstreamError(
+    `No local background image found for region '${regionSlug(input)}', condition '${weatherBucket(input.weatherCode)}', and time '${dayPart(input.weatherCode)}'.`,
+  );
 }

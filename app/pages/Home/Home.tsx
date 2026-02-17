@@ -11,6 +11,7 @@ export default function Home() {
   const [weather, setWeather] = useState<SimplifiedWeather | null>(null);
   const [weatherError, setWeatherError] = useState<string | null>(null);
   const [loadingWeather, setLoadingWeather] = useState(false);
+  const [forcedWeatherCode, setForcedWeatherCode] = useState<number | null>(null);
   const lastGeneratedBackgroundKey = useRef<string>('');
   const lastLocationKey = useRef<string>('');
 
@@ -26,7 +27,8 @@ export default function Home() {
       return;
     }
 
-    const dedupeKey = `${location.name}:${location.adminArea ?? ''}:${location.country}:${input.weatherCode ?? 'unknown'}:${input.variantKey}`;
+    const resolvedWeatherCode = forcedWeatherCode ?? input.weatherCode;
+    const dedupeKey = `${location.name}:${location.adminArea ?? ''}:${location.country}:${resolvedWeatherCode ?? 'unknown'}:${input.variantKey}`;
     if (lastGeneratedBackgroundKey.current === dedupeKey) {
       return;
     }
@@ -46,7 +48,7 @@ export default function Home() {
         locationName: location.name,
         temperature: input.temperature,
         variantKey: input.variantKey,
-        weatherCode: input.weatherCode,
+        weatherCode: resolvedWeatherCode,
         windSpeed: input.windSpeed,
       }),
     })
@@ -63,7 +65,7 @@ export default function Home() {
             location: location.name,
             source: payload.source ?? 'unknown',
             variantKey: input.variantKey,
-            weatherCode: input.weatherCode,
+            weatherCode: resolvedWeatherCode,
           });
           return;
         }
@@ -71,7 +73,7 @@ export default function Home() {
         console.log('[background] using static fallback', {
           location: location.name,
           variantKey: input.variantKey,
-          weatherCode: input.weatherCode,
+          weatherCode: resolvedWeatherCode,
         });
         if (!localStorage.getItem('weatherBackgroundImage')) {
           window.dispatchEvent(new Event('weather-background-update'));
@@ -81,13 +83,30 @@ export default function Home() {
         console.log('[background] generation request failed, using static fallback', {
           location: location.name,
           variantKey: input.variantKey,
-          weatherCode: input.weatherCode,
+          weatherCode: resolvedWeatherCode,
         });
         if (!localStorage.getItem('weatherBackgroundImage')) {
           window.dispatchEvent(new Event('weather-background-update'));
         }
       });
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const rawCode = params.get('forceWeatherCode') ?? params.get('wx');
+    if (!rawCode) {
+      setForcedWeatherCode(null);
+      return;
+    }
+
+    const parsed = Number(rawCode);
+    if (!Number.isInteger(parsed) || parsed < 0 || parsed > 30) {
+      setForcedWeatherCode(null);
+      return;
+    }
+
+    setForcedWeatherCode(parsed);
+  }, []);
 
   useEffect(() => {
     const localLocation = localStorage.getItem('location');
@@ -133,7 +152,8 @@ export default function Home() {
       })
       .then((data) => {
         setWeather(data);
-        localStorage.setItem('weatherNow', JSON.stringify({ W: data.current.weatherCode }));
+        const resolvedCurrentCode = forcedWeatherCode ?? data.current.weatherCode;
+        localStorage.setItem('weatherNow', JSON.stringify({ W: resolvedCurrentCode }));
         if (!localStorage.getItem('weatherBackgroundImage')) {
           window.dispatchEvent(new Event('weather-background-update'));
         }
@@ -143,7 +163,7 @@ export default function Home() {
           humidity: data.current.humidity,
           temperature: data.current.temperature,
           variantKey: data.current.timestamp,
-          weatherCode: data.current.weatherCode,
+          weatherCode: resolvedCurrentCode,
           windSpeed: data.current.windSpeed,
         });
 
@@ -160,7 +180,7 @@ export default function Home() {
             humidity: representative.humidity,
             temperature: representative.temperature,
             variantKey: nextDay.date,
-            weatherCode: representative.weatherCode,
+            weatherCode: forcedWeatherCode ?? representative.weatherCode,
             windSpeed: representative.windSpeed,
           });
         }
@@ -172,7 +192,7 @@ export default function Home() {
       .finally(() => {
         setLoadingWeather(false);
       });
-  }, [location]);
+  }, [location, forcedWeatherCode]);
 
   return (
     <div data-testid="home">
@@ -201,6 +221,11 @@ export default function Home() {
             {location.isRegion && (
               <p className="mb-4 text-center text-xs uppercase tracking-[0.2em] text-teal-100">
                 Regional estimate (centroid-based)
+              </p>
+            )}
+            {typeof forcedWeatherCode === 'number' && (
+              <p className="mb-4 text-center text-xs uppercase tracking-[0.2em] text-amber-200">
+                Forced weather code active: {forcedWeatherCode}
               </p>
             )}
             {loadingWeather && <p className="mt-3 text-center text-white">Loading weather...</p>}
