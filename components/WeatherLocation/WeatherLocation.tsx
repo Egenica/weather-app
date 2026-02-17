@@ -207,38 +207,42 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
         <span className="rounded-t bg-white px-2 text-xs font-light text-black">Now at a glance</span>
         <div className="flex w-full items-center overflow-x-scroll rounded border border-solid border-white bg-white bg-opacity-10 align-top backdrop-blur-xl md:w-auto md:justify-center">
           <div className="relative top-[-0.8rem] flex">
-            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
-              {nowVisual.icon ? nowVisual.icon({ size: 60, color: '#fff' }) : <span className="text-white">--</span>}
+            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center gap-2 p-2 pt-0">
+              <div className="relative top-[2px] flex h-14 items-center justify-center">
+                {nowVisual.icon ? nowVisual.icon({ size: 44, color: '#fff' }) : <span className="text-white">--</span>}
+              </div>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 {nowVisual.label}
               </span>
             </div>
-            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
-              <span className="items-center p-4 pl-10 text-center text-4xl font-light text-white">
+            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center gap-2 p-2 pt-0">
+              <span className="flex h-14 items-center text-center text-3xl font-light leading-none text-white">
                 {formatRoundedDegrees(currentSnapshot.feelsLike)}
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Feels Like
               </span>
             </div>
-            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
-              <span className="items-center p-4 text-center text-3xl font-light text-white">
+            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center gap-2 p-2 pt-0">
+              <span className="flex h-14 items-center text-center text-3xl font-light leading-none text-white">
                 {currentSnapshot.humidity ?? '--'}%
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Humidity
               </span>
             </div>
-            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
-              <span className="items-center p-4 text-center text-3xl font-light text-white">
+            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center gap-2 p-2 pt-0">
+              <span className="flex h-14 items-center text-center text-3xl font-light leading-none text-white">
                 {currentSnapshot.windSpeed ?? '--'}
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Wind mph
               </span>
             </div>
-            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
-              <WindDirection direction={currentSnapshot.windDirection ?? undefined} size={70} />
+            <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center gap-2 p-2 pt-0">
+              <div className="relative top-[2px] flex h-14 items-center justify-center">
+                <WindDirection direction={currentSnapshot.windDirection ?? undefined} size={56} />
+              </div>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-center text-xs font-light text-black">
                 Direction {currentSnapshot.windDirection ?? '--'}
               </span>
