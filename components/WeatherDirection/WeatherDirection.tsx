@@ -9,12 +9,59 @@ import {
   WiDirectionUpRight,
 } from 'weather-icons-react';
 
+const COMPASS_POINTS = [
+  'NNE',
+  'ENE',
+  'ESE',
+  'SSE',
+  'SSW',
+  'WSW',
+  'WNW',
+  'NNW',
+  'NE',
+  'NW',
+  'SE',
+  'SW',
+  'N',
+  'E',
+  'S',
+  'W',
+] as const;
+
+function normalizeDirection(direction: string | undefined): string | null {
+  if (!direction) {
+    return null;
+  }
+
+  const cleaned = direction.toUpperCase().replace(/[^A-Z]/g, '');
+  if (!cleaned) {
+    return null;
+  }
+
+  if ((COMPASS_POINTS as readonly string[]).includes(cleaned)) {
+    return cleaned;
+  }
+
+  if (cleaned.length % 2 === 0) {
+    const half = cleaned.slice(0, cleaned.length / 2);
+    if (half === cleaned.slice(cleaned.length / 2) && (COMPASS_POINTS as readonly string[]).includes(half)) {
+      return half;
+    }
+  }
+
+  const match = COMPASS_POINTS.find((point) => cleaned.includes(point));
+  return match ?? null;
+}
+
 export const WindDirection = ({ direction, size }: { direction: string | undefined; size?: number }) => {
-  //console.log('direction', direction);
-  switch (direction) {
+  const normalizedDirection = normalizeDirection(direction);
+
+  switch (normalizedDirection) {
     case 'N':
       return <WiDirectionUp size={size} color="#fff" />;
     case 'NE':
+      return <WiDirectionUpRight size={size} color="#fff" />;
+    case 'NNE':
       return <WiDirectionUpRight size={size} color="#fff" />;
     case 'NW':
       return <WiDirectionUpLeft size={size} color="#fff" />;
@@ -43,6 +90,6 @@ export const WindDirection = ({ direction, size }: { direction: string | undefin
     case 'ESE':
       return <WiDirectionDownRight size={size} color="#fff" />;
     default:
-      return direction;
+      return null;
   }
 };

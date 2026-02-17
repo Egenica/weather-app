@@ -58,6 +58,33 @@ function formatRoundedDegrees(value: number | null): string {
   return `${Math.round(value)}°`;
 }
 
+function formatRoundedPercent(value: number | null): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return '--';
+  }
+
+  return `${Math.round(value)}%`;
+}
+
+function formatRoundedMph(value: number | null): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return '--';
+  }
+
+  return String(Math.round(value));
+}
+
+function WindMphValue({ value }: { value: number | null }): React.JSX.Element {
+  const rounded = formatRoundedMph(value);
+
+  return (
+    <span className="inline-flex items-start whitespace-nowrap">
+      <span>{rounded}</span>
+      {rounded !== '--' && <span className="ml-0.5 align-super text-[11px] leading-none">mph</span>}
+    </span>
+  );
+}
+
 function formatHour(timestamp: string): string {
   return new Date(timestamp).toLocaleString('en-GB', {
     hour: 'numeric',
@@ -225,7 +252,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
             </div>
             <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center gap-2 p-2 pt-0">
               <span className="flex h-14 items-center text-center text-3xl font-light leading-none text-white">
-                {currentSnapshot.humidity ?? '--'}%
+                {formatRoundedPercent(currentSnapshot.humidity)}
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Humidity
@@ -233,7 +260,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
             </div>
             <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center gap-2 p-2 pt-0">
               <span className="flex h-14 items-center text-center text-3xl font-light leading-none text-white">
-                {currentSnapshot.windSpeed ?? '--'}
+                <WindMphValue value={currentSnapshot.windSpeed} />
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Wind mph
@@ -333,9 +360,13 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
                           </TableCell>
                           <TableCell className="text-white">{formatRoundedDegrees(hour.temperature)}</TableCell>
                           <TableCell className="text-white">{formatRoundedDegrees(hour.feelsLike)}</TableCell>
-                          <TableCell className="text-white">{hour.humidity ?? '--'}%</TableCell>
-                          <TableCell className="text-white">{hour.windSpeed ?? '--'} mph</TableCell>
-                          <TableCell className="text-white">{hour.windGust ?? '--'} mph</TableCell>
+                          <TableCell className="text-white">{formatRoundedPercent(hour.humidity)}</TableCell>
+                          <TableCell className="text-white">
+                            <WindMphValue value={hour.windSpeed} />
+                          </TableCell>
+                          <TableCell className="text-white">
+                            <WindMphValue value={hour.windGust} />
+                          </TableCell>
                           <TableCell className="text-white">
                             <div className="flex items-center gap-2">
                               <WindDirection direction={hour.windDirection ?? undefined} size={30} />

@@ -53,6 +53,24 @@ export class DataHubConfigError extends Error {
 
 const DATAHUB_HOURLY_ENDPOINT = 'https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly';
 const DATAHUB_THREE_HOURLY_ENDPOINT = 'https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/three-hourly';
+const COMPASS_POINTS = [
+  'NNE',
+  'ENE',
+  'ESE',
+  'SSE',
+  'SSW',
+  'WSW',
+  'WNW',
+  'NNW',
+  'NE',
+  'NW',
+  'SE',
+  'SW',
+  'N',
+  'E',
+  'S',
+  'W',
+] as const;
 
 function asNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -69,6 +87,27 @@ function asNumber(value: unknown): number | null {
 
 function asString(value: unknown): string | null {
   return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function normalizeWindDirection(value: string): string {
+  const cleaned = value.toUpperCase().replace(/[^A-Z]/g, '');
+  if (!cleaned) {
+    return value;
+  }
+
+  if ((COMPASS_POINTS as readonly string[]).includes(cleaned)) {
+    return cleaned;
+  }
+
+  if (cleaned.length % 2 === 0) {
+    const half = cleaned.slice(0, cleaned.length / 2);
+    if (half === cleaned.slice(cleaned.length / 2) && (COMPASS_POINTS as readonly string[]).includes(half)) {
+      return half;
+    }
+  }
+
+  const match = COMPASS_POINTS.find((point) => cleaned.includes(point));
+  return match ?? value;
 }
 
 function degreesToCompass(value: number): string {
@@ -145,8 +184,9 @@ function mapHour(hour: Record<string, unknown>): HourlyForecast {
     maxTemp !== null && minTemp !== null ? Number(((maxTemp + minTemp) / 2).toFixed(2)) : maxTemp ?? minTemp;
 
   const rawDirection = hour.windDirectionFrom10m ?? hour.windDirection ?? hour.windDirectionFrom;
+  const rawDirectionString = asString(rawDirection);
   const windDirection =
-    asString(rawDirection) ??
+    (rawDirectionString ? normalizeWindDirection(rawDirectionString) : null) ??
     (typeof rawDirection === 'number' && Number.isFinite(rawDirection) ? degreesToCompass(rawDirection) : null);
 
   return {
