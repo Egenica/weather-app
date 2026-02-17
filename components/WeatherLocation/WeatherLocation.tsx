@@ -50,6 +50,14 @@ function getWeatherVisual(code: number | null) {
   };
 }
 
+function formatRoundedDegrees(value: number | null): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return '--';
+  }
+
+  return `${Math.round(value)}°`;
+}
+
 function formatHour(timestamp: string): string {
   return new Date(timestamp).toLocaleString('en-GB', {
     hour: 'numeric',
@@ -143,7 +151,17 @@ function getDayWeatherCode(day: DailyForecast): number | null {
 
 export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLocationProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
-  const nowVisual = getWeatherVisual(weatherData.current.weatherCode);
+  const todayPage = weatherData.dailyPages.find((day) => isToday(day.date));
+  const now = new Date();
+  const highlightedTodayTimestamp = todayPage
+    ? todayPage.hours.find((hour) => isSameLocalHour(hour.timestamp, now))?.timestamp ??
+      getClosestHourTimestamp(todayPage.hours)
+    : null;
+  const highlightedCurrentHour = highlightedTodayTimestamp
+    ? todayPage?.hours.find((hour) => hour.timestamp === highlightedTodayTimestamp)
+    : null;
+  const currentSnapshot = highlightedCurrentHour ?? weatherData.current;
+  const nowVisual = getWeatherVisual(currentSnapshot.weatherCode);
 
   React.useEffect(() => {
     if (!api || typeof window === 'undefined') {
@@ -197,8 +215,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
             </div>
             <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
               <span className="items-center p-4 pl-10 text-center text-4xl font-light text-white">
-                {weatherData.current.feelsLike ?? '--'}
-                <span>°</span>
+                {formatRoundedDegrees(currentSnapshot.feelsLike)}
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Feels Like
@@ -206,7 +223,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
             </div>
             <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
               <span className="items-center p-4 text-center text-3xl font-light text-white">
-                {weatherData.current.humidity ?? '--'}%
+                {currentSnapshot.humidity ?? '--'}%
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Humidity
@@ -214,16 +231,16 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
             </div>
             <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
               <span className="items-center p-4 text-center text-3xl font-light text-white">
-                {weatherData.current.windSpeed ?? '--'}
+                {currentSnapshot.windSpeed ?? '--'}
               </span>
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-xs font-light text-black">
                 Wind mph
               </span>
             </div>
             <div className="relative flex aspect-square min-w-[120px] flex-col items-center justify-center p-2 pt-0">
-              <WindDirection direction={weatherData.current.windDirection ?? undefined} size={70} />
+              <WindDirection direction={currentSnapshot.windDirection ?? undefined} size={70} />
               <span className="absolute bottom-3 mt-1 rounded bg-white px-2 text-center text-xs font-light text-black">
-                Direction {weatherData.current.windDirection ?? '--'}
+                Direction {currentSnapshot.windDirection ?? '--'}
               </span>
             </div>
           </div>
@@ -310,8 +327,8 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
                               <span className="block w-full text-center text-xs">{visual.label}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-white">{hour.temperature ?? '--'}C</TableCell>
-                          <TableCell className="text-white">{hour.feelsLike ?? '--'}C</TableCell>
+                          <TableCell className="text-white">{formatRoundedDegrees(hour.temperature)}</TableCell>
+                          <TableCell className="text-white">{formatRoundedDegrees(hour.feelsLike)}</TableCell>
                           <TableCell className="text-white">{hour.humidity ?? '--'}%</TableCell>
                           <TableCell className="text-white">{hour.windSpeed ?? '--'} mph</TableCell>
                           <TableCell className="text-white">{hour.windGust ?? '--'} mph</TableCell>

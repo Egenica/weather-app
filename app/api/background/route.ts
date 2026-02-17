@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'locationName and country are required' }, { status: 400 });
     }
 
-    const imageUrl = await generateBackgroundImage({
+    const { imageUrl, source } = await generateBackgroundImage({
       adminArea: body.adminArea ?? null,
       country,
       feelsLike: typeof body.feelsLike === 'number' ? body.feelsLike : null,
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       windSpeed: typeof body.windSpeed === 'number' ? body.windSpeed : null,
     });
 
-    return NextResponse.json({ imageUrl });
+    return NextResponse.json({ imageUrl, source });
   } catch (error) {
     if (error instanceof BackgroundImageUpstreamError) {
       return NextResponse.json({ imageUrl: null, warning: error.message });

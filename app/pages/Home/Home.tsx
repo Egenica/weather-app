@@ -12,6 +12,7 @@ export default function Home() {
   const [weatherError, setWeatherError] = useState<string | null>(null);
   const [loadingWeather, setLoadingWeather] = useState(false);
   const lastGeneratedBackgroundKey = useRef<string>('');
+  const lastLocationKey = useRef<string>('');
 
   const requestBackgroundImage = (input: {
     feelsLike: number | null;
@@ -54,18 +55,34 @@ export default function Home() {
           return;
         }
 
-        const payload = (await response.json()) as { imageUrl?: string | null };
+        const payload = (await response.json()) as { imageUrl?: string | null; source?: string };
         if (typeof payload.imageUrl === 'string' && payload.imageUrl.length > 0) {
           localStorage.setItem('weatherBackgroundImage', payload.imageUrl);
           window.dispatchEvent(new Event('weather-background-update'));
+          console.log('[background] applied generated image', {
+            location: location.name,
+            source: payload.source ?? 'unknown',
+            variantKey: input.variantKey,
+            weatherCode: input.weatherCode,
+          });
           return;
         }
 
+        console.log('[background] using static fallback', {
+          location: location.name,
+          variantKey: input.variantKey,
+          weatherCode: input.weatherCode,
+        });
         if (!localStorage.getItem('weatherBackgroundImage')) {
           window.dispatchEvent(new Event('weather-background-update'));
         }
       })
       .catch(() => {
+        console.log('[background] generation request failed, using static fallback', {
+          location: location.name,
+          variantKey: input.variantKey,
+          weatherCode: input.weatherCode,
+        });
         if (!localStorage.getItem('weatherBackgroundImage')) {
           window.dispatchEvent(new Event('weather-background-update'));
         }
@@ -87,6 +104,14 @@ export default function Home() {
     if (!location) {
       setWeather(null);
       return;
+    }
+
+    const locationKey = `${location.name}:${location.adminArea ?? ''}:${location.country}:${location.lat}:${location.lon}`;
+    if (lastLocationKey.current !== locationKey) {
+      lastLocationKey.current = locationKey;
+      lastGeneratedBackgroundKey.current = '';
+      localStorage.removeItem('weatherBackgroundImage');
+      window.dispatchEvent(new Event('weather-background-update'));
     }
 
     setLoadingWeather(true);

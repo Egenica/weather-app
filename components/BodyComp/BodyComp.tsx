@@ -19,6 +19,13 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
   const transitionTimeoutRef = useRef<number | null>(null);
   const currentBackgroundRef = useRef(defaultBackground);
 
+  const logBackgroundSource = (source: string, details?: Record<string, unknown>) => {
+    console.log('[background] resolved image source', {
+      source,
+      ...details,
+    });
+  };
+
   const transitionToBackground = (nextBackground: string) => {
     if (!nextBackground || nextBackground === currentBackgroundRef.current || nextBackground === incomingBackground) {
       return;
@@ -58,6 +65,7 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
       try {
         const weatherNowRaw = localStorage.getItem('weatherNow');
         if (!weatherNowRaw) {
+          logBackgroundSource('default', { reason: 'missing weatherNow' });
           transitionToBackground(defaultBackground);
           return;
         }
@@ -66,12 +74,21 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
         const weather = weatherType(String(weatherNow?.W ?? ''));
 
         if (Array.isArray(weather) && typeof weather[2] === 'string' && weather[2].length > 0) {
+          logBackgroundSource('weather-code-fallback', {
+            weatherCode: weatherNow?.W ?? 'unknown',
+            imagePath: weather[2],
+          });
           transitionToBackground(weather[2]);
           return;
         }
 
+        logBackgroundSource('default', {
+          reason: 'weather mapping unavailable',
+          weatherCode: weatherNow?.W ?? 'unknown',
+        });
         transitionToBackground(defaultBackground);
       } catch {
+        logBackgroundSource('default', { reason: 'weather parsing failed' });
         transitionToBackground(defaultBackground);
       }
     };
@@ -85,9 +102,13 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
 
       const testImage = new Image();
       testImage.onload = () => {
+        logBackgroundSource('generated', {
+          imageKind: generatedBackground.startsWith('data:') ? 'data-url' : 'url',
+        });
         transitionToBackground(generatedBackground);
       };
       testImage.onerror = () => {
+        logBackgroundSource('generated-invalid', { reason: 'image failed to load' });
         localStorage.removeItem('weatherBackgroundImage');
         setBackgroundFromWeatherCode();
       };
@@ -118,7 +139,7 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className={cn('min-h-screen bg-background  font-sans antialiased', fontSans.variable)}>
+    <div className={cn('relative min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
       <div
         className="absolute inset-0"
         style={{

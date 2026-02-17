@@ -16,7 +16,10 @@ export const MiniNav = ({ location, setLocation, ...props }: MiniNavProps) => {
 
   return (
     <>
-      <nav {...props} className="flex flex-row items-center justify-between p-2 pl-3 pr-3">
+      <nav
+        {...props}
+        className="sticky top-0 z-30 flex flex-row items-center justify-between bg-black/25 p-2 pl-3 pr-3 backdrop-blur-sm"
+      >
         <Button
           variant={'link'}
           type="button"
