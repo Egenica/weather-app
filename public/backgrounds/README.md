@@ -57,3 +57,4 @@ Notes:
 - External providers are disabled.
 - To serve backgrounds from S3/CloudFront, set `BACKGROUND_ASSET_BASE_URL` (for example `https://cdn.example.com`).
 - Upload this folder with AWS CLI: `aws s3 sync public/backgrounds s3://<bucket>/backgrounds --exclude ".gitkeep" --cache-control "public,max-age=31536000,immutable"`
+- A ready-to-paste public read policy is provided at `infra/s3/weather-bg-imgs-public-read-policy.json`.

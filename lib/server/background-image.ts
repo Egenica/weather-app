@@ -176,21 +176,21 @@ async function resolveLocalBackgroundImage(input: GenerateBackgroundInput): Prom
 
   for (const candidateBucket of buckets) {
     candidates.push(
-      `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.jpg`,
-      `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.webp`,
       `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.png`,
-      `/backgrounds/uk/${region}/${candidateBucket}/v1.jpg`,
-      `/backgrounds/uk/${region}/${candidateBucket}/v1.webp`,
+      `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/uk/${region}/${candidateBucket}/${time}/v1.jpg`,
       `/backgrounds/uk/${region}/${candidateBucket}/v1.png`,
-      `/backgrounds/${region}/${candidateBucket}/${time}/v1.jpg`,
-      `/backgrounds/${region}/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/uk/${region}/${candidateBucket}/v1.webp`,
+      `/backgrounds/uk/${region}/${candidateBucket}/v1.jpg`,
       `/backgrounds/${region}/${candidateBucket}/${time}/v1.png`,
-      `/backgrounds/${region}/${candidateBucket}/v1.jpg`,
-      `/backgrounds/${region}/${candidateBucket}/v1.webp`,
+      `/backgrounds/${region}/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/${region}/${candidateBucket}/${time}/v1.jpg`,
       `/backgrounds/${region}/${candidateBucket}/v1.png`,
-      `/backgrounds/uk/${candidateBucket}/${time}/v1.jpg`,
-      `/backgrounds/uk/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/${region}/${candidateBucket}/v1.webp`,
+      `/backgrounds/${region}/${candidateBucket}/v1.jpg`,
       `/backgrounds/uk/${candidateBucket}/${time}/v1.png`,
+      `/backgrounds/uk/${candidateBucket}/${time}/v1.webp`,
+      `/backgrounds/uk/${candidateBucket}/${time}/v1.jpg`,
     );
   }
 
