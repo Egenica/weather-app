@@ -17,7 +17,6 @@ Copy `.env.example` to `.env.local` and add:
 
 ```bash
 METOFFICE_API_KEY=your-datahub-api-key
-HF_API_KEY=your-huggingface-token
 ```
 
 ## DataHub Subscription Checklist
