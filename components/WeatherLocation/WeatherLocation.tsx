@@ -365,7 +365,9 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
                           <TableCell className="text-center text-white">
                             <div className="mx-auto flex w-full max-w-[120px] flex-col items-center justify-center text-center">
                               {visual.icon ? (
-                                visual.icon({ size: 40, color: '#fff' })
+                                <span className={isNow ? 'highlighted-weather-icon inline-flex' : 'inline-flex'}>
+                                  {visual.icon({ size: 40, color: '#fff' })}
+                                </span>
                               ) : (
                                 <span className="text-white">--</span>
                               )}

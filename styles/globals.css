@@ -74,3 +74,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes highlightedIconFlash {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    opacity: 0.72;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.45));
+  }
+}
+
+@layer utilities {
+  .highlighted-weather-icon {
+    animation: highlightedIconFlash 1.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlighted-weather-icon {
+    animation: none;
+  }
+}
