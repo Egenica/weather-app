@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Loader2, LocateFixed } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
@@ -30,6 +31,79 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
   const [unknownLocation, setUnknownLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+
+  const handleUseCurrentLocation = () => {
+    setUnknownLocation(false);
+    setLocationError(null);
+
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported in this browser');
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const fallbackLat = Number(position.coords.latitude.toFixed(5));
+        const fallbackLon = Number(position.coords.longitude.toFixed(5));
+
+        const fallbackLocation = {
+          adminArea: null,
+          country: 'United Kingdom',
+          isRegion: false,
+          lat: fallbackLat,
+          lon: fallbackLon,
+          name: 'Current location',
+        };
+
+        try {
+          const response = await fetch(`/api/reverse-geocode?lat=${fallbackLat}&lon=${fallbackLon}`);
+          if (!response.ok) {
+            throw new Error('Reverse geocode request failed');
+          }
+
+          const data = await response.json();
+          const resolved = data?.location;
+          const nextLocation =
+            resolved &&
+            typeof resolved.name === 'string' &&
+            typeof resolved.lat === 'number' &&
+            typeof resolved.lon === 'number'
+              ? {
+                  adminArea: typeof resolved.adminArea === 'string' ? resolved.adminArea : null,
+                  country: typeof resolved.country === 'string' ? resolved.country : 'United Kingdom',
+                  isRegion: false,
+                  lat: resolved.lat,
+                  lon: resolved.lon,
+                  name: resolved.name,
+                }
+              : fallbackLocation;
+
+          console.log('[location][current-location-resolved]', {
+            fallbackLocation,
+            resolvedLocation: resolved ?? null,
+            selectedLocation: nextLocation,
+          });
+
+          setLocation(nextLocation);
+          localStorage.setItem('location', JSON.stringify(nextLocation));
+        } catch {
+          console.log('[location][current-location-fallback]', {
+            fallbackLocation,
+          });
+          setLocation(fallbackLocation);
+          localStorage.setItem('location', JSON.stringify(fallbackLocation));
+        } finally {
+          setLocating(false);
+        }
+      },
+      () => {
+        setLocating(false);
+        setLocationError('Unable to access your current location');
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
 
   useEffect(() => {
     const trimmed = search.trim();
@@ -82,7 +156,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
         <Input
           type="text"
           value={search}
-          className="ring-offset-background:none rounded-3xl p-8 text-center text-xl font-light placeholder:text-slate-400"
+          className="ring-offset-background:none rounded-3xl p-8 pl-14 pr-14 text-center text-xl font-light placeholder:text-slate-400"
           onChange={(e) => setSearch(e.target.value)}
           placeholder={placeholder}
           onFocus={() => {
@@ -97,69 +171,30 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
         />
         <Button
           type="button"
-          className="absolute right-4 top-1/2 -translate-y-1/2 transform rounded-full bg-slate-400"
+          variant="ghost"
+          size="icon"
+          className="absolute left-3 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed"
+          onClick={handleUseCurrentLocation}
+          disabled={locating}
+          aria-label={locating ? 'Finding your location' : 'Use current location'}
+          title={locating ? 'Finding your location...' : 'Use current location'}
+        >
+          {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-3 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full bg-slate-200 text-slate-600 hover:bg-slate-400"
           onClick={() => {
             setSearch('');
             setLocations([]);
             setUnknownLocation(false);
             setLocationError(null);
           }}
+          aria-label="Clear search"
         >
           X
-        </Button>
-      </div>
-      <div className="mx-auto mt-3 w-auto md:w-2/4">
-        <Button
-          type="button"
-          className="w-full rounded-md bg-teal-600 text-white hover:bg-teal-500"
-          onClick={() => {
-            setUnknownLocation(false);
-            setLocationError(null);
-
-            if (!navigator.geolocation) {
-              setLocationError('Geolocation is not supported in this browser');
-              return;
-            }
-
-            setLocating(true);
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const lat = Number(position.coords.latitude.toFixed(5));
-                const lon = Number(position.coords.longitude.toFixed(5));
-
-                setLocation({
-                  adminArea: null,
-                  country: 'United Kingdom',
-                  isRegion: false,
-                  lat,
-                  lon,
-                  name: 'Current location',
-                });
-
-                localStorage.setItem(
-                  'location',
-                  JSON.stringify({
-                    adminArea: null,
-                    country: 'United Kingdom',
-                    isRegion: false,
-                    lat,
-                    lon,
-                    name: 'Current location',
-                  }),
-                );
-
-                setLocating(false);
-              },
-              () => {
-                setLocating(false);
-                setLocationError('Unable to access your current location');
-              },
-              { enableHighAccuracy: true, timeout: 10000 },
-            );
-          }}
-          disabled={locating}
-        >
-          {locating ? 'Finding your location...' : 'Use current location'}
         </Button>
       </div>
       {showLocations && (
@@ -177,7 +212,7 @@ export default function WeatherSearch({ setLocation, ...props }: WeatherSearchPr
                 <li key={`${location.name}-${location.lat}-${location.lon}`}>
                   <button
                     type="button"
-                    className="group block h-auto w-full p-2 text-left text-xl font-light text-white hover:bg-slate-100 hover:text-black"
+                    className="group block h-auto w-full rounded-sm p-2 text-left text-xl font-light text-white hover:bg-slate-100 hover:text-black"
                     onClick={() => {
                       setLocation(location);
                       localStorage.setItem('location', JSON.stringify(location));
