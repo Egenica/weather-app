@@ -15,13 +15,6 @@ type BodyPayload = {
 
 export async function POST(request: Request) {
   try {
-    console.log('[env-check][background]', {
-      amplifyBranch: process.env.AWS_BRANCH ?? process.env.AMPLIFY_BRANCH ?? null,
-      backgroundAssetBaseUrl: process.env.BACKGROUND_ASSET_BASE_URL ?? null,
-      hasMetOfficeApiKey: Boolean(process.env.METOFFICE_API_KEY),
-      nodeEnv: process.env.NODE_ENV,
-    });
-
     const body = (await request.json()) as BodyPayload;
     const locationName = (body.locationName ?? '').trim();
     const country = (body.country ?? '').trim();
