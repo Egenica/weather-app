@@ -1,6 +1,14 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import {
+  createWeatherEffectsEngine,
+  getDebugWeatherScene,
+  getEffectsMode,
+  isEffectsEnabled,
+  isHtmlInCanvasRequested,
+  resolveSceneFromWeatherCode,
+} from '@/lib/canvas/weather-effects';
 import { Inter as FontSans } from 'next/font/google';
 import { useEffect, useRef, useState } from 'react';
 
@@ -16,8 +24,29 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
   const [backgroundImage, setBackgroundImage] = useState(defaultBackground);
   const [incomingBackground, setIncomingBackground] = useState<string | null>(null);
   const [incomingVisible, setIncomingVisible] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const effectsEngineRef = useRef<ReturnType<typeof createWeatherEffectsEngine> | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
   const currentBackgroundRef = useRef(defaultBackground);
+
+  const getStoredWeatherCode = (): number | null => {
+    try {
+      const weatherNowRaw = localStorage.getItem('weatherNow');
+      if (!weatherNowRaw) {
+        return null;
+      }
+
+      const weatherNow = JSON.parse(weatherNowRaw) as { W?: number | string } | null;
+      const parsed = Number(weatherNow?.W);
+      if (!Number.isFinite(parsed)) {
+        return null;
+      }
+
+      return parsed;
+    } catch {
+      return null;
+    }
+  };
 
   const logBackgroundSource = (source: string, details?: Record<string, unknown>) => {
     console.log('[background] resolved image source', {
@@ -138,6 +167,50 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (!isEffectsEnabled(window.location.search)) {
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const engine = createWeatherEffectsEngine({
+      canvas,
+      intensity: getEffectsMode(window.location.search) === 'storm' ? 'storm' : 'default',
+      scene: getDebugWeatherScene(window.location.search) ?? resolveSceneFromWeatherCode(getStoredWeatherCode()),
+      useHtmlInCanvas: isHtmlInCanvasRequested(window.location.search),
+    });
+    effectsEngineRef.current = engine;
+
+    const syncSceneFromStorage = () => {
+      const nextScene = getDebugWeatherScene(window.location.search) ?? resolveSceneFromWeatherCode(getStoredWeatherCode());
+      engine.updateScene(nextScene);
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (!event.key || event.key === 'weatherNow') {
+        syncSceneFromStorage();
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('weather-background-update', syncSceneFromStorage);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('weather-background-update', syncSceneFromStorage);
+      effectsEngineRef.current?.destroy();
+      effectsEngineRef.current = null;
+    };
+  }, []);
+
   return (
     <div className={cn('relative min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
       <div
@@ -163,7 +236,7 @@ export default function BodyComp({ children }: { children: React.ReactNode }) {
           }}
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent" />
+      <canvas className="pointer-events-none fixed inset-0 z-50 block h-screen w-screen" ref={canvasRef} />
       <div className="relative z-10">{children}</div>
     </div>
   );

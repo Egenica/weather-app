@@ -222,10 +222,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
       }
 
       localStorage.setItem('weatherNow', JSON.stringify({ W: selectedCode }));
-      const hasGeneratedBackground = Boolean(localStorage.getItem('weatherBackgroundImage'));
-      if (!hasGeneratedBackground) {
-        window.dispatchEvent(new Event('weather-background-update'));
-      }
+      window.dispatchEvent(new Event('weather-background-update'));
       onDayWeatherChange?.({
         date: selectedDay.date,
         weatherCode: selectedCode,
@@ -323,7 +320,7 @@ export const WeatherLocation = ({ weatherData, onDayWeatherChange }: WeatherLoca
                   <CarouselNext className="relative ml-auto" />
                 </h3>
 
-                <Table className="bg-blur mb-5 rounded bg-white bg-opacity-10 backdrop-blur-xl">
+                <Table data-rain-collider="true" className="bg-blur mb-5 rounded bg-white bg-opacity-10 backdrop-blur-xl">
                   <TableHeader className="bg-white bg-opacity-10">
                     <TableRow className="hover:bg-transparent">
                       <TableHead className="py-2 text-white">Date & Time</TableHead>

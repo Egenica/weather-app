@@ -154,9 +154,7 @@ export default function Home() {
         setWeather(data);
         const resolvedCurrentCode = forcedWeatherCode ?? data.current.weatherCode;
         localStorage.setItem('weatherNow', JSON.stringify({ W: resolvedCurrentCode }));
-        if (!localStorage.getItem('weatherBackgroundImage')) {
-          window.dispatchEvent(new Event('weather-background-update'));
-        }
+        window.dispatchEvent(new Event('weather-background-update'));
 
         requestBackgroundImage({
           feelsLike: data.current.feelsLike,
